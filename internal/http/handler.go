@@ -32,6 +32,11 @@ func (e *ExpenseHandler) GetExpenses(c *gin.Context) {
 		return
 	}
 
+	if expenses == nil {
+		c.JSON(http.StatusOK, make([]models.Expense, 0))
+		return
+	}
+
 	c.JSON(http.StatusOK, expenses)
 }
 

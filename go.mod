@@ -3,6 +3,7 @@ module example.com/expenses-tracker
 go 1.23.3
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/lib/pq v1.10.9
