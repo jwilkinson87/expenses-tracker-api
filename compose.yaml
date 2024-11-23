@@ -17,7 +17,7 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_USER: expenses_user
-      POSTGRES_PASSWORD: expenses_app!
+      POSTGRES_PASSWORD: "expenses_app!"
       POSTGRES_DB: expenses_db
     volumes:
       - db_data:/var/lib/postgresql/data

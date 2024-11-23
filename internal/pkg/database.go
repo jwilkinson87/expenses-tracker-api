@@ -18,7 +18,7 @@ func NewDatabase() (*sql.DB, error) {
 		DbName:   os.Getenv("DB_NAME"),
 	}
 
-	connStr := fmt.Sprintf("host=%s port=%s user=%s"+
+	connStr := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		dbConfig.Host, dbConfig.Port, dbConfig.User, dbConfig.Password, dbConfig.DbName)
 
