@@ -32,3 +32,18 @@ func (e *ExpenseHandler) GetExpenses(c *gin.Context) {
 
 	c.JSON(http.StatusOK, expenses)
 }
+
+func (e *ExpenseHandler) CreateExpense(c *gin.Context) {
+	var json models.Expense
+	if err := c.ShouldBindJSON(&json); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := e.repo.CreateExpense(c.Request.Context(), &json)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	c.JSON(http.StatusCreated, nil)
+}
