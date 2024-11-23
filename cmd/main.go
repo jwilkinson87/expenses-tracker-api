@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
+	"example.com/expenses-tracker/internal/database"
 	httpHandler "example.com/expenses-tracker/internal/http"
-	database "example.com/expenses-tracker/internal/pkg"
 	"example.com/expenses-tracker/internal/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -20,6 +20,7 @@ func Setup() {
 	if err != nil {
 		panic(fmt.Errorf(errFailedToConnectToDatabase, err))
 	}
+
 	repo := repository.NewExpensesRepository(db)
 	handler := httpHandler.NewHandler(repo)
 

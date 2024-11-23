@@ -3,7 +3,8 @@ package repository
 import (
 	"context"
 
-	models "example.com/expenses-tracker/internal/pkg"
+	"example.com/expenses-tracker/internal/models"
+	"example.com/expenses-tracker/internal/requests"
 )
 
 type ExpenseRepository interface {
@@ -12,4 +13,9 @@ type ExpenseRepository interface {
 	UpdateExpense(context.Context, *models.Expense) error
 	DeleteExpense(context.Context, *models.Expense) error
 	GetAllForUser(context.Context, *models.User) (models.Expenses, error)
+}
+
+type UserRepository interface {
+	CreateUser(context.Context, *models.User) error
+	LoginUser(context.Context, *requests.LoginRequest) string
 }

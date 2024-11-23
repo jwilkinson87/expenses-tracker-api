@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	models "example.com/expenses-tracker/internal/pkg"
+	"example.com/expenses-tracker/internal/models"
 	"example.com/expenses-tracker/internal/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-uuid"

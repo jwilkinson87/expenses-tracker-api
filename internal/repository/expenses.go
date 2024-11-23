@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	models "example.com/expenses-tracker/internal/pkg"
+	"example.com/expenses-tracker/internal/models"
 )
 
 const (

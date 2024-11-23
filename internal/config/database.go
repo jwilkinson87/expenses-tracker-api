@@ -1,4 +1,4 @@
-package pkg
+package config
 
 type DatabaseConfig struct {
 	Host     string
