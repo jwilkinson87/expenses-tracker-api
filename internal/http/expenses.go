@@ -1,6 +1,7 @@
 package http
 
 import (
+	"log"
 	"net/http"
 
 	"example.com/expenses-tracker/internal/models"
@@ -28,6 +29,7 @@ func (e *ExpenseHandler) GetExpenses(c *gin.Context) {
 
 	expenses, err := e.repo.GetAllForUser(ctx, user)
 	if err != nil {
+		log.Fatal(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve expenses"})
 		return
 	}
@@ -43,12 +45,14 @@ func (e *ExpenseHandler) GetExpenses(c *gin.Context) {
 func (e *ExpenseHandler) CreateExpense(c *gin.Context) {
 	var json models.Expense
 	if err := c.ShouldBindJSON(&json); err != nil {
+		log.Fatal(err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	err := e.repo.CreateExpense(c.Request.Context(), &json)
 	if err != nil {
+		log.Fatal(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
