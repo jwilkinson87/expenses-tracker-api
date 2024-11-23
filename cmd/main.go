@@ -26,4 +26,5 @@ func Setup() {
 	router.GET("/expenses", handler.GetExpenses)
 
 	router.Run()
+	defer db.Close()
 }

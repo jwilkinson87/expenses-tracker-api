@@ -6,6 +6,7 @@ import (
 	models "example.com/expenses-tracker/internal/pkg"
 	"example.com/expenses-tracker/internal/repository"
 	"github.com/gin-gonic/gin"
+	"github.com/hashicorp/go-uuid"
 )
 
 type ExpenseHandler struct {
@@ -18,10 +19,11 @@ func NewHandler(repository repository.ExpenseRepository) *ExpenseHandler {
 }
 
 func (e *ExpenseHandler) GetExpenses(c *gin.Context) {
+	uuid, _ := uuid.GenerateUUID()
 	ctx := c.Request.Context()
 	// TODO: This needs to be an authenticated user
 	user := &models.User{
-		ID: "123",
+		ID: uuid,
 	}
 
 	expenses, err := e.repo.GetAllForUser(ctx, user)

@@ -27,7 +27,6 @@ func NewDatabase() (*sql.DB, error) {
 		return nil, err
 	}
 
-	defer db.Close()
 	err = db.Ping()
 	if err != nil {
 		return nil, err
