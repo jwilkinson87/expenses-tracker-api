@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"example.com/expenses-tracker/internal/models"
-	"example.com/expenses-tracker/internal/requests"
 )
 
 type ExpenseRepository interface {
@@ -17,5 +16,13 @@ type ExpenseRepository interface {
 
 type UserRepository interface {
 	CreateUser(context.Context, *models.User) error
-	LoginUser(context.Context, *requests.LoginRequest) string
+	UpdateUser(context.Context, *models.User) error
+	GetUserByEmailAddress(context.Context, string) (*models.User, error)
+	DeleteUser(context.Context, *models.User) error
+}
+
+type UserAuthRepository interface {
+	CreateAuthToken(context.Context, *models.UserToken) error
+	DeleteAuthToken(context.Context, *models.UserToken) error
+	GetByAuthToken(context.Context, string) (*models.UserToken, error)
 }

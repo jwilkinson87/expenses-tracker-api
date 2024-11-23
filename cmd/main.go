@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"example.com/expenses-tracker/internal/database"
-	httpHandler "example.com/expenses-tracker/internal/http"
+	"example.com/expenses-tracker/internal/http"
 	"example.com/expenses-tracker/internal/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +22,7 @@ func Setup() {
 	}
 
 	repo := repository.NewExpensesRepository(db)
-	handler := httpHandler.NewHandler(repo)
+	handler := http.NewHandler(repo)
 
 	router.GET("/expenses", handler.GetExpenses)
 
