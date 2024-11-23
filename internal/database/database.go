@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"example.com/expenses-tracker/internal/config"
 	_ "github.com/lib/pq"
 )
 
 // NewDatabase creates a new database connection
 func NewDatabase() (*sql.DB, error) {
-	dbConfig := &DatabaseConfig{
+	dbConfig := &config.DatabaseConfig{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
 		User:     os.Getenv("DB_USER"),
