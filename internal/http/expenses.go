@@ -14,12 +14,17 @@ type ExpenseHandler struct {
 	repo repository.ExpenseRepository
 }
 
-// NewHandler sets up a new HTTP handler
-func NewHandler(repository repository.ExpenseRepository) *ExpenseHandler {
+// NewExpensesHandler sets up a new HTTP handler
+func NewExpensesHandler(repository repository.ExpenseRepository) *ExpenseHandler {
 	return &ExpenseHandler{repo: repository}
 }
 
-func (e *ExpenseHandler) GetExpenses(c *gin.Context) {
+func (e *ExpenseHandler) registerRoutes(g *gin.Engine) {
+	g.GET("/expenses", e.getAll)
+	g.POST("/expenses", e.create)
+}
+
+func (e *ExpenseHandler) getAll(c *gin.Context) {
 	uuid, _ := uuid.GenerateUUID()
 	ctx := c.Request.Context()
 	// TODO: This needs to be an authenticated user
@@ -42,7 +47,7 @@ func (e *ExpenseHandler) GetExpenses(c *gin.Context) {
 	c.JSON(http.StatusOK, expenses)
 }
 
-func (e *ExpenseHandler) CreateExpense(c *gin.Context) {
+func (e *ExpenseHandler) create(c *gin.Context) {
 	var json models.Expense
 	if err := c.ShouldBindJSON(&json); err != nil {
 		log.Fatal(err)
