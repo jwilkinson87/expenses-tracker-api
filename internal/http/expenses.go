@@ -19,7 +19,7 @@ func NewExpensesHandler(repository repositories.ExpenseRepository) *ExpenseHandl
 	return &ExpenseHandler{repo: repository}
 }
 
-func (e *ExpenseHandler) registerRoutes(g *gin.Engine) {
+func (e *ExpenseHandler) RegisterRoutes(g *gin.Engine) {
 	g.GET("/expenses", e.getAll)
 	g.POST("/expenses", e.create)
 }

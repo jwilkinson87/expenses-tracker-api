@@ -27,7 +27,7 @@ func NewExpensesRepository(db *sql.DB) *expensesRepository {
 
 func (r *expensesRepository) CreateExpense(ctx context.Context, model *models.Expense) error {
 	query := "INSERT INTO expenses(id, amount, user_id, category_id, description, created_at) VALUES ($1, $2, $3, $4, $5, $6)"
-	_, err := r.db.ExecContext(ctx, query, model.ID, model.Amount, model.User.ID, model.Category.ID, model.Description, model.CreatedAt.Format("2006-01-02 15:04:05"))
+	_, err := r.db.ExecContext(ctx, query, model.ID, model.Amount, model.User.ID, model.Category.ID, model.Description, model.CreatedAt)
 	if err != nil {
 		return fmt.Errorf(errFailedToCreateExpense, err)
 	}
@@ -37,12 +37,30 @@ func (r *expensesRepository) CreateExpense(ctx context.Context, model *models.Ex
 
 func (r *expensesRepository) GetExpense(ctx context.Context, id string) (*models.Expense, error) {
 	var expense models.Expense
+	var user models.User
+	var category models.Category
 
-	query := "SELECT e.*, u.first_name, u.last_name, u.email FROM expenses WHERE id = $1"
-	err := r.db.QueryRowContext(ctx, query, id).Scan(&expense.ID, &expense.Amount, &expense.User.ID, &expense.Category.ID, &expense.Description, &expense.User.CreatedAt, &expense.User.FirstName, &expense.User.LastName, expense.User.Email)
+	query := `
+		SELECT
+			e.id, e.amount, e.expense_date, e.description, e.created_at,
+			c.id AS category_id, c.name AS category_name,
+			u.id AS user_id, u.first_name, u.last_name, u.email, u.password, u.created_at
+		FROM expenses e
+		JOIN categories c ON e.category_id = c.id
+		JOIN users u ON e.user_id = u.id
+		WHERE e.id = $1
+	`
+	err := r.db.QueryRowContext(ctx, query, id).Scan(
+		&expense.ID, &expense.Amount, &expense.Date, &expense.Description, &expense.CreatedAt,
+		&category.ID, &category.Label,
+		&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt,
+	)
 	if err != nil {
 		return nil, fmt.Errorf(errFailedToGetExpenseById, err)
 	}
+
+	expense.Category = &category
+	expense.User = &user
 
 	return &expense, nil
 }

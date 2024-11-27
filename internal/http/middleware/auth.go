@@ -23,6 +23,8 @@ func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 			return
 		}
 
+		a.handler.ValidateToken(c, token)
+
 		c.Next()
 	}
 }

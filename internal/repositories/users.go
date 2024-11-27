@@ -31,7 +31,13 @@ func (u *userRepository) UpdateUser(ctx context.Context, user *models.User) erro
 }
 
 func (u *userRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	sql := "SELECT * FROM users WHERE email_address = $1"
+	sql := `
+		SELECT
+			u.id, u.first_name, u.last_name, u.email, u.password, u.created_at
+		FROM
+			users u
+		WHERE u.email = $1 LIMIT 1
+	`
 	var user models.User
 	err := u.db.QueryRowContext(ctx, sql, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt)
 	if err != nil {

@@ -11,6 +11,7 @@ type Expense struct {
 	ID          string    `json:"id"`
 	Amount      int64     `json:"amount"`
 	Category    *Category `json:"category"`
+	Date        time.Time `json:"expense_date"`
 	CreatedAt   time.Time `json:"date"`
 	Description string    `json:"description"`
 	User        *User     `json:"user"`

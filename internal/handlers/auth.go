@@ -1,6 +1,17 @@
 package handlers
 
-import "example.com/expenses-tracker/internal/repositories"
+import (
+	"context"
+	"errors"
+	"fmt"
+
+	"example.com/expenses-tracker/internal/repositories"
+)
+
+const (
+	errInvalidToken       = "invalid token"
+	errfailedToCheckToken = "failed to check token: %w"
+)
 
 type AuthHandler struct {
 	userTokenRepository repositories.UserAuthRepository
@@ -15,6 +26,20 @@ func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRep
 	}
 }
 
-func (a *AuthHandler) validateToken(token string) (error, bool) {
-	return nil, false
+// ValidateToken will check that a specified token value is valid.
+func (a *AuthHandler) ValidateToken(ctx context.Context, token string) (error, bool) {
+	if token == "" || len(token) == 0 {
+		return errors.New(errInvalidToken), false
+	}
+
+	userToken, err := a.userTokenRepository.GetByAuthToken(ctx, token)
+	if err != nil {
+		return fmt.Errorf(errfailedToCheckToken, err), false
+	}
+
+	if userToken == nil {
+		return nil, false
+	}
+
+	return nil, userToken.IsTokenValid()
 }
