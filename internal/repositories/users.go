@@ -30,7 +30,11 @@ func (u *userRepository) UpdateUser(ctx context.Context, user *models.User) erro
 	return nil
 }
 
-func (u *userRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+func (u *userRepository) DeleteUser(ctx context.Context, user *models.User) error {
+	return nil
+}
+
+func (u *userRepository) GetUserByEmailAddress(ctx context.Context, email string) (*models.User, error) {
 	sql := `
 		SELECT
 			u.id, u.first_name, u.last_name, u.email, u.password, u.created_at

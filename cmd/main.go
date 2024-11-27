@@ -1,11 +1,28 @@
 package cmd
 
 import (
+	"database/sql"
 	"fmt"
+	"sync"
 
 	"example.com/expenses-tracker/internal/database"
+	"example.com/expenses-tracker/internal/handlers"
 	"example.com/expenses-tracker/internal/http"
+	"example.com/expenses-tracker/internal/http/middleware"
+	"example.com/expenses-tracker/internal/repositories"
 	"github.com/gin-gonic/gin"
+)
+
+type Container struct {
+	UserRepository     repositories.UserRepository
+	UserAuthRepository repositories.UserAuthRepository
+	ExpenseRepository  repositories.ExpenseRepository
+	AuthHandler        *handlers.AuthHandler
+}
+
+var (
+	container *Container
+	once      sync.Once
 )
 
 const (
@@ -20,9 +37,33 @@ func Setup() {
 		panic(fmt.Errorf(errFailedToConnectToDatabase, err))
 	}
 
+	container = &Container{}
+	once.Do(func() {
+		setupRepositories(db)
+	})
+
 	router := &http.Router{}
-	router.Setup(gin, db)
+	router.Setup(gin, db, createRouteRegistries())
+	setupMiddleware(gin)
 
 	gin.Run()
 	defer db.Close()
+}
+
+func setupRepositories(db *sql.DB) {
+	container.UserAuthRepository = repositories.NewAuthRepository(db)
+	container.UserRepository = repositories.NewUserRepository(db)
+	container.ExpenseRepository = repositories.NewExpensesRepository(db)
+	container.AuthHandler = handlers.NewAuthHandler(container.UserAuthRepository, container.UserRepository)
+}
+
+func setupMiddleware(g *gin.Engine) {
+	authMiddleware := middleware.NewAuthMiddleware(container.AuthHandler)
+
+	g.Use(middleware.RequestIdMiddleware())
+	g.Use(authMiddleware.HandleAuthToken())
+}
+
+func createRouteRegistries() []http.RouteRegistry {
+	return []http.RouteRegistry{}
 }
