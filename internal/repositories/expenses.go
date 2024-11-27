@@ -85,9 +85,18 @@ func (r *expensesRepository) DeleteExpense(ctx context.Context, model *models.Ex
 	return nil
 }
 
-func (r *expensesRepository) GetAllForUser(ctx context.Context, user *models.User) (models.Expenses, error) {
-	query := "SELECT * FROM expenses WHERE user_id = $1 ORDER BY id DESC"
-	rows, err := r.db.QueryContext(ctx, query, user.ID)
+func (r *expensesRepository) GetAllForUser(ctx context.Context, userModel *models.User) (models.Expenses, error) {
+	query := `
+		SELECT
+			e.id, e.amount, e.expense_date, e.description, e.created_at,
+			c.id AS category_id, c.name AS category_name,
+			u.id AS user_id, u.first_name, u.last_name, u.email, u.password, u.created_at
+		FROM expenses e
+		JOIN categories c ON e.category_id = c.id
+		JOIN users u ON e.user_id = u.id
+		WHERE u.id = $1
+	`
+	rows, err := r.db.QueryContext(ctx, query, userModel.ID)
 	if err != nil {
 		return nil, fmt.Errorf(errFailedToGetExpensesForUser, err)
 	}
@@ -95,13 +104,20 @@ func (r *expensesRepository) GetAllForUser(ctx context.Context, user *models.Use
 	defer rows.Close()
 	var expenses models.Expenses
 	for rows.Next() {
-		expense := &models.Expense{
-			User: user,
-		}
+		expense := &models.Expense{}
+		category := &models.Category{}
+		user := &models.User{}
 
-		if err := rows.Scan(&expense.ID, &expense.Amount, &expense.User.ID, &expense.Category.ID, &expense.Description, &expense.CreatedAt); err != nil {
+		if err := rows.Scan(
+			&expense.ID, &expense.Amount, &expense.Date, &expense.Description, &expense.CreatedAt,
+			&category.ID, &category.Label,
+			&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt,
+		); err != nil {
 			return nil, fmt.Errorf(errFailedToGetExpensesForUser, err)
 		}
+
+		expense.Category = category
+		expense.User = user
 
 		expenses = append(expenses, expense)
 	}
