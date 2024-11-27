@@ -42,9 +42,8 @@ func Setup() {
 		setupRepositories(db)
 	})
 
-	router := &http.Router{}
-	router.Setup(gin, db, createRouteRegistries())
 	setupMiddleware(gin)
+	setupHttpHandlers(gin)
 
 	gin.Run()
 	defer db.Close()
@@ -64,6 +63,10 @@ func setupMiddleware(g *gin.Engine) {
 	g.Use(authMiddleware.HandleAuthToken())
 }
 
-func createRouteRegistries() []http.RouteRegistry {
-	return []http.RouteRegistry{}
+func setupHttpHandlers(g *gin.Engine) {
+	expenseHandler := http.NewExpensesHandler(container.ExpenseRepository)
+	expenseHandler.RegisterRoutes(g)
+
+	userHandler := http.NewUsersHandler(container.UserRepository)
+	userHandler.RegisterRoutes(g)
 }
