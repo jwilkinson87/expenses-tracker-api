@@ -27,19 +27,19 @@ func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRep
 }
 
 // ValidateToken will check that a specified token value is valid.
-func (a *AuthHandler) ValidateToken(ctx context.Context, token string) (error, bool) {
+func (a *AuthHandler) ValidateToken(ctx context.Context, token string) (bool, error) {
 	if token == "" || len(token) == 0 {
-		return errors.New(errInvalidToken), false
+		return false, errors.New(errInvalidToken)
 	}
 
 	userToken, err := a.userTokenRepository.GetByAuthToken(ctx, token)
 	if err != nil {
-		return fmt.Errorf(errfailedToCheckToken, err), false
+		return false, fmt.Errorf(errfailedToCheckToken, err)
 	}
 
 	if userToken == nil {
-		return nil, false
+		return false, nil
 	}
 
-	return nil, userToken.IsTokenValid()
+	return userToken.IsTokenValid(), nil
 }

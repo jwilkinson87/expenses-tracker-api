@@ -19,12 +19,22 @@ func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("authorization")
 		if token == "" || len(token) == 0 {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 			return
 		}
 
-		a.handler.ValidateToken(c, token)
+		isValid, err := a.handler.ValidateToken(c, token)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to validate token"})
+			return
+		}
 
+		if !isValid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			return
+		}
+
+		c.Set("user_token", token)
 		c.Next()
 	}
 }
