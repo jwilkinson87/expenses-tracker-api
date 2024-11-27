@@ -19,6 +19,7 @@ type UserRepository interface {
 	UpdateUser(context.Context, *models.User) error
 	GetUserByEmailAddress(context.Context, string) (*models.User, error)
 	DeleteUser(context.Context, *models.User) error
+	GetUserByAuthToken(context.Context, string) (*models.User, error)
 }
 
 type UserAuthRepository interface {

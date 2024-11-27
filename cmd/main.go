@@ -69,4 +69,7 @@ func setupHttpHandlers(g *gin.Engine) {
 
 	userHandler := http.NewUsersHandler(container.UserRepository)
 	userHandler.RegisterRoutes(g)
+
+	authHandler := http.NewAuthHandler(container.UserAuthRepository)
+	authHandler.RegisterRoutes(g)
 }
