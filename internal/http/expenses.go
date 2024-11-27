@@ -5,17 +5,17 @@ import (
 	"net/http"
 
 	"example.com/expenses-tracker/internal/models"
-	"example.com/expenses-tracker/internal/repository"
+	"example.com/expenses-tracker/internal/repositories"
 	"github.com/gin-gonic/gin"
 	"github.com/hashicorp/go-uuid"
 )
 
 type ExpenseHandler struct {
-	repo repository.ExpenseRepository
+	repo repositories.ExpenseRepository
 }
 
 // NewExpensesHandler sets up a new HTTP handler
-func NewExpensesHandler(repository repository.ExpenseRepository) *ExpenseHandler {
+func NewExpensesHandler(repository repositories.ExpenseRepository) *ExpenseHandler {
 	return &ExpenseHandler{repo: repository}
 }
 

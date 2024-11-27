@@ -3,10 +3,19 @@ package middleware
 import (
 	"net/http"
 
+	"example.com/expenses-tracker/internal/handlers"
 	"github.com/gin-gonic/gin"
 )
 
-func HandleAuthToken() gin.HandlerFunc {
+type authMiddleware struct {
+	handler *handlers.AuthHandler
+}
+
+func NewAuthMiddleware(handler *handlers.AuthHandler) *authMiddleware {
+	return &authMiddleware{handler}
+}
+
+func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("authorization")
 		if token == "" || len(token) == 0 {
