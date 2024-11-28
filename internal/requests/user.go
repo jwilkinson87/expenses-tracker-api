@@ -1,8 +1,8 @@
 package requests
 
 type LoginRequest struct {
-	EmailAddress string `json:"email_address"`
-	Password     string `json:"password"`
+	EmailAddress string `json:"email_address" binding:"required"`
+	Password     string `json:"password" binding:"required"`
 }
 
 type CreateUserRequest struct {
