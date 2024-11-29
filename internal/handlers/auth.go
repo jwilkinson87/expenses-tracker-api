@@ -16,11 +16,12 @@ import (
 )
 
 const (
-	errInvalidToken           = "invalid token"
-	errFailedToCheckToken     = "failed to check token: %w"
-	errFailedToCreateToken    = "failed to create token: %w"
-	errFailedToGetUserByEmail = "failed to get user by email address: %w"
-	errInvalidCredentials     = "user credentials incorrect"
+	errInvalidToken            = "invalid token"
+	errFailedToCheckToken      = "failed to check token: %w"
+	errFailedToCreateToken     = "failed to create token: %w"
+	errFailedToGetTokenByValue = "failed to get token by value: %w"
+	errFailedToGetUserByEmail  = "failed to get user by email address: %w"
+	errInvalidCredentials      = "user credentials incorrect"
 )
 
 type AuthHandler struct {
@@ -67,6 +68,27 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, request *requests.
 	}
 
 	return response, nil
+}
+
+func (h *AuthHandler) HandleLogout(ctx context.Context, token string) (bool, error) {
+	result, err := h.userTokenRepository.GetByAuthToken(ctx, token)
+	if err != nil {
+		return false, fmt.Errorf(errFailedToGetTokenByValue, err)
+	}
+
+	if result == nil {
+		return false, errors.New(errInvalidToken)
+	}
+
+	if !result.IsTokenValid() {
+		return false, errors.New(errInvalidToken)
+	}
+
+	if err = h.userTokenRepository.DeleteAuthToken(ctx, result); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 func (h *AuthHandler) persistTokenForUser(ctx context.Context, token string, user *models.User) (*models.UserToken, error) {

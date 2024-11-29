@@ -49,5 +49,22 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 }
 
 func (h *AuthHandler) logoutUser(c *gin.Context) {
+	token, exists := c.Get("user_token")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "you are not logged in"})
+		return
+	}
 
+	success, err := h.internalHandler.HandleLogout(c, token.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "logout could not be completed"})
+		return
+	}
+
+	if success {
+		c.JSON(http.StatusOK, gin.H{"success": true})
+		return
+	}
+
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "logout could not be completed"})
 }
