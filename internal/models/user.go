@@ -13,9 +13,18 @@ type User struct {
 }
 
 type UserToken struct {
+	ID         string
 	Value      string
 	User       *User
 	ExpiryTime *time.Time
+}
+
+type ResetToken struct {
+	ID         string
+	CreatedAt  time.Time
+	ExpiryTime time.Time
+	ResetToken string
+	User       *User
 }
 
 func (u *UserToken) IsTokenValid() bool {

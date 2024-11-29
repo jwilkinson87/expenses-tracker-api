@@ -21,6 +21,8 @@ func NewAuthHandler(internalHandler handlers.AuthHandler) *AuthHandler {
 
 func (h *AuthHandler) RegisterRoutes(g *gin.Engine) {
 	g.POST("/login", h.loginUser)
+	g.POST("/forgot-password", h.initiateForgottenPassword)
+	g.POST("/reset-password", h.updatePasswordFromResetRequest)
 	g.POST("/logout", h.logoutUser)
 }
 
@@ -46,6 +48,14 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, jsonResponse)
+}
+
+func (h *AuthHandler) initiateForgottenPassword(c *gin.Context) {
+
+}
+
+func (h *AuthHandler) updatePasswordFromResetRequest(c *gin.Context) {
+
 }
 
 func (h *AuthHandler) logoutUser(c *gin.Context) {

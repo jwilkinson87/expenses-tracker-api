@@ -15,9 +15,17 @@ CREATE TABLE categories (
 CREATE TABLE expenses (
     id UUID PRIMARY KEY,
     amount BIGINT NOT NULL,
-    category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    category_id UUID REFERENCES categories (id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users (id) ON DELETE CASCADE,
     expense_date DATE NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE reset_tokens (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expiry_time TIMESTAMP,
+    reset_token VARCHAR(64) NOT NULL,
+    user_id UUID REFERNECES users (id) ON DELETE CASCADE
+)
