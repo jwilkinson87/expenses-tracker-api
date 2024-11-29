@@ -11,12 +11,14 @@ import (
 	"example.com/expenses-tracker/internal/models"
 	"example.com/expenses-tracker/internal/repositories"
 	"example.com/expenses-tracker/internal/requests"
+	"example.com/expenses-tracker/internal/responses"
 	"golang.org/x/crypto/bcrypt"
 )
 
 const (
 	errInvalidToken           = "invalid token"
 	errFailedToCheckToken     = "failed to check token: %w"
+	errFailedToCreateToken    = "failed to create token: %w"
 	errFailedToGetUserByEmail = "failed to get user by email address: %w"
 	errInvalidCredentials     = "user credentials incorrect"
 )
@@ -36,7 +38,7 @@ func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRep
 	}
 }
 
-func (h *AuthHandler) HandleLoginRequest(ctx context.Context, request *requests.LoginRequest) (*models.User, error) {
+func (h *AuthHandler) HandleLoginRequest(ctx context.Context, request *requests.LoginRequest) (*responses.AuthenticatedUserResponse, error) {
 	user, err := h.userRepository.GetUserByEmailAddress(ctx, request.EmailAddress)
 	if err != nil {
 		return nil, fmt.Errorf(errFailedToGetUserByEmail, err)
@@ -52,18 +54,25 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, request *requests.
 
 	token, err := h.generateSecureTokenForUser(32)
 	if err != nil {
-		return user, err
+		return nil, err
 	}
 
-	h.persistTokenForUser(ctx, token, user)
+	result, err := h.persistTokenForUser(ctx, token, user)
+	if err != nil {
+		return nil, fmt.Errorf(errFailedToCreateToken, err)
+	}
+	response := &responses.AuthenticatedUserResponse{
+		Token:      token,
+		ExpiryTime: *result.ExpiryTime,
+	}
 
-	return user, nil
+	return response, nil
 }
 
-func (h *AuthHandler) persistTokenForUser(ctx context.Context, token string, user *models.User) (bool, error) {
+func (h *AuthHandler) persistTokenForUser(ctx context.Context, token string, user *models.User) (*models.UserToken, error) {
 	encryptedToken, err := h.encryptionHandler.EncryptValue([]byte(token))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	expiryTime := time.Now().Add(time.Minute * 20)
@@ -76,7 +85,7 @@ func (h *AuthHandler) persistTokenForUser(ctx context.Context, token string, use
 
 	h.userTokenRepository.CreateAuthToken(ctx, authToken)
 
-	return true, nil
+	return authToken, nil
 }
 
 func (h *AuthHandler) generateSecureTokenForUser(tokenSize int64) (string, error) {

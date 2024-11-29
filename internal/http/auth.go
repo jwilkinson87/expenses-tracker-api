@@ -1,6 +1,8 @@
 package http
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 
 	"example.com/expenses-tracker/internal/handlers"
@@ -30,10 +32,20 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 		return
 	}
 
-	user, err := h.internalHandler.HandleLoginRequest(c, &loginRequest)
+	response, err := h.internalHandler.HandleLoginRequest(c, &loginRequest)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
 	}
+
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		log.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"errror": "unable to fulfill login request"})
+		return
+	}
+
+	c.JSON(http.StatusOK, jsonResponse)
 }
 
 func (h *AuthHandler) logoutUser(c *gin.Context) {
