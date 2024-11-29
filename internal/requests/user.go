@@ -6,8 +6,8 @@ type LoginRequest struct {
 }
 
 type CreateUserRequest struct {
-	EmailAddress string `json:"email_address"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
-	Password     string `json:"password"`
+	EmailAddress string `json:"email_address" binding:"required,email"`
+	FirstName    string `json:"first_name" binding:"required,alpha"`
+	LastName     string `json:"last_name" binding:"required,alpha"`
+	Password     string `json:"password" binding:"required,matches=^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,}$"`
 }
