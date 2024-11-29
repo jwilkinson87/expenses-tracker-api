@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"example.com/expenses-tracker/internal/config"
 	"example.com/expenses-tracker/internal/database"
 	"example.com/expenses-tracker/internal/handlers"
 	"example.com/expenses-tracker/internal/http"
@@ -17,6 +18,7 @@ type Container struct {
 	UserRepository     repositories.UserRepository
 	UserAuthRepository repositories.UserAuthRepository
 	ExpenseRepository  repositories.ExpenseRepository
+	EncryptionHandler  *handlers.EncryptionHandler
 	AuthHandler        *handlers.AuthHandler
 }
 
@@ -39,7 +41,7 @@ func Setup() {
 
 	container = &Container{}
 	once.Do(func() {
-		setupRepositories(db)
+		setupContainer(db)
 	})
 
 	setupMiddleware(gin)
@@ -49,11 +51,17 @@ func Setup() {
 	defer db.Close()
 }
 
-func setupRepositories(db *sql.DB) {
+func setupContainer(db *sql.DB) {
+	encryptionHandler, err := handlers.NewEncryptionHandler(config.NewEncryptionConfigFromEnvironmentVariables())
+	if err != nil {
+		panic(err)
+	}
+
 	container.UserAuthRepository = repositories.NewAuthRepository(db)
 	container.UserRepository = repositories.NewUserRepository(db)
 	container.ExpenseRepository = repositories.NewExpensesRepository(db)
-	container.AuthHandler = handlers.NewAuthHandler(container.UserAuthRepository, container.UserRepository)
+	container.EncryptionHandler = encryptionHandler
+	container.AuthHandler = handlers.NewAuthHandler(container.UserAuthRepository, container.UserRepository, encryptionHandler)
 }
 
 func setupMiddleware(g *gin.Engine) {

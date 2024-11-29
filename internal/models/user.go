@@ -13,8 +13,9 @@ type User struct {
 }
 
 type UserToken struct {
-	Value string
-	User  *User
+	Value      string
+	User       *User
+	ExpiryTime *time.Time
 }
 
 func (u *UserToken) IsTokenValid() bool {
