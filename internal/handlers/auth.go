@@ -66,8 +66,7 @@ func (h *AuthHandler) persistTokenForUser(ctx context.Context, token string, use
 		return false, err
 	}
 
-	duration, _ := time.ParseDuration("20m") // expire a token 20 minutes from now
-	expiryTime := time.Now().Add(duration)
+	expiryTime := time.Now().Add(time.Minute * 20)
 
 	authToken := &models.UserToken{
 		Value:      string(encryptedToken),
