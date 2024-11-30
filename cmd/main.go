@@ -20,6 +20,7 @@ type Container struct {
 	ExpenseRepository  repositories.ExpenseRepository
 	EncryptionHandler  *handlers.EncryptionHandler
 	AuthHandler        *handlers.AuthHandler
+	middleware         map[string]gin.HandlerFunc
 }
 
 var (
@@ -62,18 +63,21 @@ func setupContainer(db *sql.DB) {
 	container.ExpenseRepository = repositories.NewExpensesRepository(db)
 	container.EncryptionHandler = encryptionHandler
 	container.AuthHandler = handlers.NewAuthHandler(container.UserAuthRepository, container.UserRepository, encryptionHandler)
+	container.middleware = make(map[string]gin.HandlerFunc, 1)
 }
 
 func setupMiddleware(g *gin.Engine) {
-	authMiddleware := middleware.NewAuthMiddleware(container.AuthHandler)
-
 	g.Use(middleware.RequestIdMiddleware())
-	g.Use(authMiddleware.HandleAuthToken())
+
+	authMiddleware := middleware.NewAuthMiddleware(container.AuthHandler)
+	container.middleware["auth"] = authMiddleware.HandleAuthToken()
 }
 
 func setupHttpHandlers(g *gin.Engine) {
+	expensesGroup := g.Group("/api/expenses")
+	expensesGroup.Use(container.middleware["auth"])
 	expenseHandler := http.NewExpensesHandler(container.ExpenseRepository)
-	expenseHandler.RegisterRoutes(g)
+	expenseHandler.RegisterRoutes(expensesGroup)
 
 	userHandler := http.NewUsersHandler(container.UserRepository)
 	userHandler.RegisterRoutes(g)
