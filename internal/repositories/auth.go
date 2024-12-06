@@ -19,6 +19,10 @@ func (a *authRepository) CreateAuthToken(ctx context.Context, token *models.User
 	return nil
 }
 
+func (a *authRepository) DeleteAllForUser(ctx context.Context, user *models.User) error {
+	return nil
+}
+
 func (a *authRepository) DeleteAuthToken(ctx context.Context, token *models.UserToken) error {
 	return nil
 }

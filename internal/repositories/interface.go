@@ -25,6 +25,7 @@ type UserRepository interface {
 type UserAuthRepository interface {
 	CreateAuthToken(context.Context, *models.UserToken) error
 	DeleteAuthToken(context.Context, *models.UserToken) error
+	DeleteAllForUser(context.Context, *models.User) error
 	GetByAuthToken(context.Context, string) (*models.UserToken, error)
 }
 
