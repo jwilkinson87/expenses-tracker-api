@@ -42,7 +42,7 @@ func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRep
 func (h *AuthHandler) HandleLoginRequest(ctx context.Context, request *requests.LoginRequest) (*responses.AuthenticatedUserResponse, error) {
 	user, err := h.userRepository.GetUserByEmailAddress(ctx, request.EmailAddress)
 	if err != nil {
-		return nil, fmt.Errorf(errFailedToGetUserByEmail, err)
+		return nil, err
 	}
 
 	if user == nil {

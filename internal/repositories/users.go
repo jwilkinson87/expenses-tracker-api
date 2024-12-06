@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"example.com/expenses-tracker/internal/models"
@@ -36,7 +37,7 @@ func (u *userRepository) DeleteUser(ctx context.Context, user *models.User) erro
 }
 
 func (u *userRepository) GetUserByEmailAddress(ctx context.Context, email string) (*models.User, error) {
-	sql := `
+	sqlStmt := `
 		SELECT
 			u.id, u.first_name, u.last_name, u.email, u.password, u.created_at
 		FROM
@@ -44,7 +45,12 @@ func (u *userRepository) GetUserByEmailAddress(ctx context.Context, email string
 		WHERE u.email = $1 LIMIT 1
 	`
 	var user models.User
-	err := u.db.QueryRowContext(ctx, sql, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt)
+	err := u.db.QueryRowContext(ctx, sqlStmt, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf(errFailedToGetUserByEmail, err)
 	}
