@@ -1,6 +1,9 @@
 package config
 
-import "os"
+import (
+	"encoding/base64"
+	"os"
+)
 
 type EncryptionConfig struct {
 	Key string
@@ -12,7 +15,12 @@ func NewEncryptionConfig(key string, IV string) *EncryptionConfig {
 }
 
 func NewEncryptionConfigFromEnvironmentVariables() *EncryptionConfig {
+	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("ENCRYPTION_KEY"))
+	if err != nil {
+		panic("Unable to decode encryption key")
+	}
+
 	return &EncryptionConfig{
-		Key: os.Getenv("ENCRYPTION_KEY"),
+		Key: string(decoded),
 	}
 }

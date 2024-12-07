@@ -22,7 +22,7 @@ type CreateUserRequest struct {
 }
 
 type UpdatePasswordRequest struct {
-	CurrentPassword string `json:"current_password" binding:"required"`                                                                         // Required
-	NewPassword     string `json:"new_password" binding:"required,min=8,matches=^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,}$"` // Required, strong password
+	CurrentPassword string `json:"current_password" binding:"required"`
+	NewPassword     string `json:"new_password" binding:"required,min=8,matches=^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&])[A-Za-z0-9@$!%*?&]{8,}$"`
 	ConfirmPassword string `json:"confirm_password" binding:"required,eqfield=NewPassword"`
 }

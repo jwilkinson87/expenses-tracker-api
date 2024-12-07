@@ -18,7 +18,12 @@ func NewUsersHandler(repo repositories.UserRepository) *UsersHandler {
 }
 
 func (u *UsersHandler) RegisterRoutes(g *gin.Engine) {
+	g.POST("/users", u.createUser)
 	g.GET("/whoami", u.getAuthenticatedUser)
+}
+
+func (u *UsersHandler) createUser(c *gin.Context) {
+
 }
 
 func (u *UsersHandler) getAuthenticatedUser(c *gin.Context) {
@@ -26,14 +31,14 @@ func (u *UsersHandler) getAuthenticatedUser(c *gin.Context) {
 	user, err := u.repo.GetUserByAuthToken(c, token)
 	if err != nil {
 		log.Fatal(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve authenticated user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve authenticated user"})
 		return
 	}
 
 	jsonResponse, err := json.Marshal(user)
 	if err != nil {
 		log.Fatal(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve authenticated user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve authenticated user"})
 		return
 	}
 

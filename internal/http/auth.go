@@ -7,8 +7,8 @@ import (
 
 	"example.com/expenses-tracker/internal/handlers"
 	"example.com/expenses-tracker/internal/requests"
+	"example.com/expenses-tracker/internal/responses"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
 type AuthHandler struct {
@@ -31,20 +31,20 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 	var loginRequest requests.LoginRequest
 
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
-		c.JSON(http.StatusBadRequest, loginRequest.FormatValidationMessages(err.(validator.ValidationErrors)))
+		c.JSON(http.StatusBadRequest, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, loginRequest, err))
 		return
 	}
 
 	response, err := h.internalHandler.HandleLoginRequest(c, &loginRequest)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(http.StatusUnauthorized, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, loginRequest, err))
 		return
 	}
 
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, gin.H{"errror": "unable to fulfill login request"})
+		c.JSON(http.StatusInternalServerError, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, loginRequest, err))
 		return
 	}
 

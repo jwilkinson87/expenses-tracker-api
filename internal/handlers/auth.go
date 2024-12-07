@@ -21,6 +21,7 @@ const (
 	errFailedToCreateToken     = "failed to create token: %w"
 	errFailedToGetTokenByValue = "failed to get token by value: %w"
 	errFailedToGetUserByEmail  = "failed to get user by email address: %w"
+	errFailedToGetUserByToken  = "failed to get user by token: %w"
 	errInvalidCredentials      = "user credentials incorrect"
 )
 
@@ -37,6 +38,15 @@ func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRep
 		userRepository:      userRepository,
 		encryptionHandler:   encryptionHandler,
 	}
+}
+
+func (h *AuthHandler) GetUserForAuthToken(ctx context.Context, token string) (*models.User, error) {
+	result, err := h.userRepository.GetUserByAuthToken(ctx, token)
+	if err != nil {
+		return nil, fmt.Errorf(errFailedToGetUserByToken, err)
+	}
+
+	return result, nil
 }
 
 func (h *AuthHandler) HandleLoginRequest(ctx context.Context, request *requests.LoginRequest) (*responses.AuthenticatedUserResponse, error) {
