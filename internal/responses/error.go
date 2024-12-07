@@ -32,17 +32,17 @@ func NewErrorJsonHttpResponse(statusCode int, obj any, errors any) *ErrorRespons
 
 	switch statusCode {
 	case http.StatusInternalServerError:
-		errorResponse = NewErrorResponse("An error occurred", map[string]string{})
+		errorResponse = NewErrorResponse("an error occurred", map[string]string{})
 	case http.StatusBadRequest:
 		errs, ok := errors.(validator.ValidationErrors)
 		if ok {
 			formattedErrors := util.FormatValidationMessages(obj, errs)
-			errorResponse = NewErrorResponse("Invalid request", formattedErrors)
+			errorResponse = NewErrorResponse("invalid request", formattedErrors)
 		} else {
-			errorResponse = NewErrorResponse("Invalid request", map[string]string{})
+			errorResponse = NewErrorResponse("invalid request", map[string]string{})
 		}
 	case http.StatusUnauthorized:
-		errorResponse = NewErrorResponse("Unauthorised", map[string]string{})
+		errorResponse = NewErrorResponse("unauthorised", map[string]string{})
 	}
 
 	return errorResponse

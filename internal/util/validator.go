@@ -20,11 +20,11 @@ func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) m
 
 		switch tag {
 		case "required":
-			formatted[fieldName] = "This field is required"
+			formatted[fieldName] = "this field is required"
 		case "email":
-			formatted[fieldName] = "This field requires a valid email address"
+			formatted[fieldName] = "this field requires a valid email address"
 		default:
-			formatted[fieldName] = "This field failed validation"
+			formatted[fieldName] = "this field failed validation"
 		}
 	}
 

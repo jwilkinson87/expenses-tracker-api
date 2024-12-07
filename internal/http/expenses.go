@@ -20,8 +20,8 @@ func NewExpensesHandler(repository repositories.ExpenseRepository) *ExpenseHandl
 }
 
 func (e *ExpenseHandler) RegisterRoutes(g *gin.RouterGroup) {
-	g.GET("/", e.getAll)
-	g.POST("/", e.create)
+	g.GET("", e.getAll)
+	g.POST("", e.create)
 }
 
 func (e *ExpenseHandler) getAll(c *gin.Context) {
