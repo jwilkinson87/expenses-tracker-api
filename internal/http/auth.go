@@ -37,14 +37,14 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 
 	response, err := h.internalHandler.HandleLoginRequest(c, &loginRequest)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, loginRequest, err))
+		c.JSON(http.StatusUnauthorized, responses.NewErrorJsonHttpResponse(http.StatusUnauthorized, loginRequest, err))
 		return
 	}
 
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, loginRequest, err))
+		c.JSON(http.StatusInternalServerError, responses.NewErrorJsonHttpResponse(http.StatusInternalServerError, loginRequest, err))
 		return
 	}
 
