@@ -11,7 +11,10 @@ import (
 	"example.com/expenses-tracker/internal/http"
 	"example.com/expenses-tracker/internal/http/middleware"
 	"example.com/expenses-tracker/internal/repositories"
+	"example.com/expenses-tracker/internal/validators"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type Container struct {
@@ -34,7 +37,9 @@ const (
 
 // Setup prepares this application
 func Setup() {
-	gin := gin.New()
+	engine := gin.New()
+	engine.Use(gin.Recovery())
+
 	db, err := database.NewDatabase()
 	if err != nil {
 		panic(fmt.Errorf(errFailedToConnectToDatabase, err))
@@ -45,10 +50,11 @@ func Setup() {
 		setupContainer(db)
 	})
 
-	setupMiddleware(gin)
-	setupHttpHandlers(gin)
+	setupMiddleware(engine)
+	setupHttpHandlers(engine)
+	setupValidators()
 
-	gin.Run()
+	engine.Run()
 	defer db.Close()
 }
 
@@ -84,4 +90,10 @@ func setupHttpHandlers(g *gin.Engine) {
 
 	authHandler := http.NewAuthHandler(*container.AuthHandler)
 	authHandler.RegisterRoutes(g)
+}
+
+func setupValidators() {
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("validpassword", validators.ValidPassword)
+	}
 }

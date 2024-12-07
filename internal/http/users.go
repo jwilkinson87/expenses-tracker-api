@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"example.com/expenses-tracker/internal/repositories"
+	"example.com/expenses-tracker/internal/requests"
+	"example.com/expenses-tracker/internal/responses"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +25,12 @@ func (u *UsersHandler) RegisterRoutes(g *gin.Engine) {
 }
 
 func (u *UsersHandler) createUser(c *gin.Context) {
+	var request requests.CreateUserRequest
 
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, request, err))
+		return
+	}
 }
 
 func (u *UsersHandler) getAuthenticatedUser(c *gin.Context) {
