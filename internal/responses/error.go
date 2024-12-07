@@ -18,6 +18,10 @@ type ErrorResponse struct {
 }
 
 func NewErrorResponse(message string, details map[string]string) *ErrorResponse {
+	if details == nil {
+		details = map[string]string{}
+	}
+
 	return &ErrorResponse{
 		Status: "error",
 		ErrorDetails: ErrorDetails{
@@ -31,18 +35,18 @@ func NewErrorJsonHttpResponse(statusCode int, obj any, errors any) *ErrorRespons
 	var errorResponse *ErrorResponse
 
 	switch statusCode {
-	case http.StatusInternalServerError:
-		errorResponse = NewErrorResponse("an error occurred", map[string]string{})
 	case http.StatusBadRequest:
 		errs, ok := errors.(validator.ValidationErrors)
 		if ok {
 			formattedErrors := util.FormatValidationMessages(obj, errs)
 			errorResponse = NewErrorResponse("invalid request", formattedErrors)
 		} else {
-			errorResponse = NewErrorResponse("invalid request", map[string]string{})
+			errorResponse = NewErrorResponse("invalid request", nil)
 		}
 	case http.StatusUnauthorized:
-		errorResponse = NewErrorResponse("unauthorised", map[string]string{})
+		errorResponse = NewErrorResponse("unauthorised", nil)
+	default:
+		errorResponse = NewErrorResponse("an error occurred", nil)
 	}
 
 	return errorResponse
