@@ -7,40 +7,37 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-const (
-	requiredFieldMessage           = "This field is required"
-	validEmailMessage              = "This field requires a valid email address"
-	defaultFailedValidationMessage = "This field failed validation"
-	eqPasswordMessage              = "Passwords do not match"
-)
-
 func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) *map[string]string {
-	formatted := make(map[string]string, len(fieldErrors))
+	messages := make(map[string]string)
+	objType := reflect.TypeOf(obj)
 
 	for _, fieldError := range fieldErrors {
-		tag := fieldError.Tag()
-		field, ok := reflect.TypeOf(obj).FieldByName(fieldError.Field())
 		fieldName := fieldError.Field()
+		tag := fieldError.Tag()
 
-		if ok {
-			fieldName = string(field.Tag.Get("json"))
+		// Find the struct field
+		field, ok := objType.FieldByName(fieldName)
+		if !ok {
+			// If the field doesn't exist, use a default error message
+			messages[fieldName] = "Invalid input"
+			continue
 		}
 
-		switch tag {
-		case "required":
-			formatted[fieldName] = requiredFieldMessage
-		case "email":
-			formatted[fieldName] = validEmailMessage
-		case "validpassword":
-			formatted[fieldName] = ValidPasswordFieldMessage
-		case "eqfield":
-			// Get the name of the field to compare against
-			paramField := fieldError.Param()
-			formatted[fieldName] = fmt.Sprintf("This field must match %s", paramField)
-		default:
-			formatted[fieldName] = defaultFailedValidationMessage
+		// Use the JSON tag if available, otherwise default to the struct field name
+		jsonTag := field.Tag.Get("json")
+		if jsonTag == "" {
+			jsonTag = fieldName
+		}
+
+		// Extract the custom validation tag for the specific validation rule
+		validationTag := fmt.Sprintf("validation[%s]", tag)
+		if message, ok := field.Tag.Lookup(validationTag); ok {
+			messages[jsonTag] = message
+		} else {
+			// Fallback message if no custom tag exists
+			messages[jsonTag] = fmt.Sprintf("%s validation failed", jsonTag)
 		}
 	}
 
-	return &formatted
+	return &messages
 }
