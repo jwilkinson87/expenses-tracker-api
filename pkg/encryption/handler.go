@@ -1,4 +1,4 @@
-package handlers
+package encryption
 
 import (
 	"crypto/aes"
@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 
-	"example.com/expenses-tracker/internal/config"
+	"example.com/expenses-tracker/pkg/config"
 )
 
 const (

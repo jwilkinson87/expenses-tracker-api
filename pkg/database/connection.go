@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"example.com/expenses-tracker/internal/config"
+	"example.com/expenses-tracker/pkg/config"
 	_ "github.com/lib/pq"
 )
 

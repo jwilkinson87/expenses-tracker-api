@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"example.com/expenses-tracker/internal/repositories"
+	"example.com/expenses-tracker/pkg/encryption"
 	"example.com/expenses-tracker/pkg/models"
 	"example.com/expenses-tracker/pkg/requests"
 	"example.com/expenses-tracker/pkg/responses"
@@ -28,11 +29,11 @@ const (
 type AuthHandler struct {
 	userTokenRepository repositories.UserAuthRepository
 	userRepository      repositories.UserRepository
-	encryptionHandler   *EncryptionHandler
+	encryptionHandler   *encryption.EncryptionHandler
 }
 
 // NewAuthHandler creates a new auth handler for checking an authenticated user
-func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRepository repositories.UserRepository, encryptionHandler *EncryptionHandler) *AuthHandler {
+func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRepository repositories.UserRepository, encryptionHandler *encryption.EncryptionHandler) *AuthHandler {
 	return &AuthHandler{
 		userTokenRepository: userTokenRepository,
 		userRepository:      userRepository,
