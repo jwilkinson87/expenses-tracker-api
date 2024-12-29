@@ -16,7 +16,10 @@ func NewAuthRepository(db *sql.DB) *authRepository {
 }
 
 func (a *authRepository) CreateAuthToken(ctx context.Context, token *models.UserToken) error {
-	return nil
+	sql := `INSERT INTO users_auth_tokens (id, created_at, expiry_time, token, user_id) VALUES ($1, $2, $3, $4, $5)`
+	_, err := a.db.ExecContext(ctx, sql, token.ID, token.CreatedAt, token.ExpiryTime, token.Value, token.User.ID)
+
+	return err
 }
 
 func (a *authRepository) DeleteAllForUser(ctx context.Context, user *models.User) error {

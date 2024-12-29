@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"example.com/expenses-tracker/internal/repositories"
-	"example.com/expenses-tracker/pkg/encryption"
 	"example.com/expenses-tracker/pkg/models"
 	"example.com/expenses-tracker/pkg/requests"
 	"example.com/expenses-tracker/pkg/responses"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -29,15 +29,13 @@ const (
 type AuthHandler struct {
 	userTokenRepository repositories.UserAuthRepository
 	userRepository      repositories.UserRepository
-	encryptionHandler   *encryption.EncryptionHandler
 }
 
 // NewAuthHandler creates a new auth handler for checking an authenticated user
-func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRepository repositories.UserRepository, encryptionHandler *encryption.EncryptionHandler) *AuthHandler {
+func NewAuthHandler(userTokenRepository repositories.UserAuthRepository, userRepository repositories.UserRepository) *AuthHandler {
 	return &AuthHandler{
 		userTokenRepository: userTokenRepository,
 		userRepository:      userRepository,
-		encryptionHandler:   encryptionHandler,
 	}
 }
 
@@ -103,22 +101,29 @@ func (h *AuthHandler) HandleLogout(ctx context.Context, token string) (bool, err
 }
 
 func (h *AuthHandler) persistTokenForUser(ctx context.Context, token string, user *models.User) (*models.UserToken, error) {
-	encryptedToken, err := h.encryptionHandler.EncryptValue([]byte(token))
+	encryptedToken, err := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
+	now := time.Now()
 	expiryTime := time.Now().Add(time.Minute * 20)
+	id, _ := uuid.NewV7()
 
 	authToken := &models.UserToken{
+		ID:         id.String(),
+		CreatedAt:  &now,
 		Value:      string(encryptedToken),
 		User:       user,
 		ExpiryTime: &expiryTime,
 	}
 
-	h.userTokenRepository.CreateAuthToken(ctx, authToken)
+	err = h.userTokenRepository.CreateAuthToken(ctx, authToken)
+	if err != nil {
+		return nil, fmt.Errorf(errFailedToCreateToken, err)
+	}
 
-	return authToken, nil
+	return authToken, err
 }
 
 func (h *AuthHandler) generateSecureTokenForUser(tokenSize int64) (string, error) {

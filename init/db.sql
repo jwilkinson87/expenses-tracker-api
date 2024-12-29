@@ -1,4 +1,4 @@
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
@@ -7,12 +7,20 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS users_auth_tokens (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expiry_time TIMESTAMP,
+    token VARCHAR(64) NOT NULL,
+    user_id UUID REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS categories (
     id UUID PRIMARY KEY,
     label VARCHAR(255) UNIQUE NOT NULL
 );
 
-CREATE TABLE expenses (
+CREATE TABLE IF NOT EXISTS expenses (
     id UUID PRIMARY KEY,
     amount BIGINT NOT NULL,
     category_id UUID REFERENCES categories (id) ON DELETE SET NULL,
@@ -22,7 +30,7 @@ CREATE TABLE expenses (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE reset_tokens (
+CREATE TABLE IF NOT EXISTS reset_tokens (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expiry_time TIMESTAMP,

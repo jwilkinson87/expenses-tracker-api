@@ -21,6 +21,7 @@ type UserToken struct {
 	ID         string
 	Value      string
 	User       *User
+	CreatedAt  *time.Time
 	ExpiryTime *time.Time
 }
 
