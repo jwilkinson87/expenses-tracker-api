@@ -3,6 +3,8 @@ package cmd
 import (
 	"database/sql"
 	"fmt"
+	"log/slog"
+	"os"
 	"sync"
 
 	"example.com/expenses-tracker/internal/handlers"
@@ -35,6 +37,9 @@ const (
 
 // Setup prepares this application
 func Setup() {
+	handler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})
+	slog.SetDefault(slog.New(handler))
+
 	engine := gin.New()
 	engine.Use(gin.Recovery())
 
