@@ -1,17 +1,8 @@
 package requests
 
-import (
-	"example.com/expenses-tracker/internal/util"
-	"github.com/go-playground/validator/v10"
-)
-
 type LoginRequest struct {
 	EmailAddress string `json:"email_address" binding:"required,email"`
 	Password     string `json:"password" binding:"required"`
-}
-
-func (l LoginRequest) FormatValidationMessages(errors validator.ValidationErrors) map[string]string {
-	return util.FormatValidationMessages(l, errors)
 }
 
 type CreateUserRequest struct {

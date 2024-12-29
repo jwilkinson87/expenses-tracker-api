@@ -1,10 +1,9 @@
-package util
+package validators
 
 import (
 	"fmt"
 	"reflect"
 
-	"example.com/expenses-tracker/internal/validators"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -33,7 +32,7 @@ func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) m
 		case "email":
 			formatted[fieldName] = validEmailMessage
 		case "validpassword":
-			formatted[fieldName] = validators.ValidPasswordFieldMessage
+			formatted[fieldName] = ValidPasswordFieldMessage
 		case "eqfield":
 			// Get the name of the field to compare against
 			paramField := fieldError.Param()

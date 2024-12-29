@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	"example.com/expenses-tracker/internal/models"
+	"example.com/expenses-tracker/pkg/models"
 )
 
 type ExpenseRepository interface {

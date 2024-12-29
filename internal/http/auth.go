@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"example.com/expenses-tracker/internal/handlers"
-	"example.com/expenses-tracker/internal/requests"
-	"example.com/expenses-tracker/internal/responses"
+	"example.com/expenses-tracker/pkg/requests"
+	"example.com/expenses-tracker/pkg/responses"
 	"github.com/gin-gonic/gin"
 )
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"example.com/expenses-tracker/internal/models"
+	"example.com/expenses-tracker/pkg/models"
 )
 
 type authRepository struct {

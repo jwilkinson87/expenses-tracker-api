@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"time"
 
-	"example.com/expenses-tracker/internal/models"
 	"example.com/expenses-tracker/internal/repositories"
-	"example.com/expenses-tracker/internal/requests"
-	"example.com/expenses-tracker/internal/responses"
+	"example.com/expenses-tracker/pkg/models"
+	"example.com/expenses-tracker/pkg/requests"
+	"example.com/expenses-tracker/pkg/responses"
 	"golang.org/x/crypto/bcrypt"
 )
 

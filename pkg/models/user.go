@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"example.com/expenses-tracker/internal/requests"
+	"example.com/expenses-tracker/pkg/requests"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
