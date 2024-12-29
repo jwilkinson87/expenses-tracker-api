@@ -1,4 +1,4 @@
-package validators
+package validation
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ const (
 	eqPasswordMessage              = "Passwords do not match"
 )
 
-func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) map[string]string {
+func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) *map[string]string {
 	formatted := make(map[string]string, len(fieldErrors))
 
 	for _, fieldError := range fieldErrors {
@@ -42,5 +42,5 @@ func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) m
 		}
 	}
 
-	return formatted
+	return &formatted
 }

@@ -6,9 +6,11 @@ import (
 	"net/http"
 
 	"example.com/expenses-tracker/internal/handlers"
+	"example.com/expenses-tracker/internal/validation"
 	"example.com/expenses-tracker/pkg/requests"
 	"example.com/expenses-tracker/pkg/responses"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type AuthHandler struct {
@@ -31,20 +33,21 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 	var loginRequest requests.LoginRequest
 
 	if err := c.ShouldBindJSON(&loginRequest); err != nil {
-		c.JSON(http.StatusBadRequest, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, loginRequest, err))
+		validationErrors := validation.FormatValidationMessages(loginRequest, err.(validator.ValidationErrors))
+		c.JSON(http.StatusBadRequest, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, validationErrors))
 		return
 	}
 
 	response, err := h.internalHandler.HandleLoginRequest(c, &loginRequest)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, responses.NewErrorJsonHttpResponse(http.StatusUnauthorized, loginRequest, err))
+		c.JSON(http.StatusUnauthorized, responses.NewErrorJsonHttpResponse(http.StatusUnauthorized, nil))
 		return
 	}
 
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
-		c.JSON(http.StatusInternalServerError, responses.NewErrorJsonHttpResponse(http.StatusInternalServerError, loginRequest, err))
+		c.JSON(http.StatusInternalServerError, responses.NewErrorJsonHttpResponse(http.StatusInternalServerError, nil))
 		return
 	}
 

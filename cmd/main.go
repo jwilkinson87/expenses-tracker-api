@@ -11,7 +11,7 @@ import (
 	"example.com/expenses-tracker/internal/http"
 	"example.com/expenses-tracker/internal/http/middleware"
 	"example.com/expenses-tracker/internal/repositories"
-	"example.com/expenses-tracker/internal/validators"
+	"example.com/expenses-tracker/internal/validation"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -94,6 +94,6 @@ func setupHttpHandlers(g *gin.Engine) {
 
 func setupValidators() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("validpassword", validators.ValidPassword)
+		v.RegisterValidation("validpassword", validation.ValidPassword)
 	}
 }

@@ -6,10 +6,12 @@ import (
 	"net/http"
 
 	"example.com/expenses-tracker/internal/repositories"
+	"example.com/expenses-tracker/internal/validation"
 	"example.com/expenses-tracker/pkg/models"
 	"example.com/expenses-tracker/pkg/requests"
 	"example.com/expenses-tracker/pkg/responses"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 type UsersHandler struct {
@@ -29,7 +31,8 @@ func (u *UsersHandler) createUser(c *gin.Context) {
 	var request requests.CreateUserRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, request, err))
+		validationErrors := validation.FormatValidationMessages(request, err.(validator.ValidationErrors))
+		c.JSON(http.StatusBadRequest, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, validationErrors))
 		return
 	}
 

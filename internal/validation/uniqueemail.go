@@ -1,4 +1,4 @@
-package validators
+package validation
 
 import (
 	"example.com/expenses-tracker/internal/repositories"
