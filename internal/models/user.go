@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"example.com/expenses-tracker/internal/requests"
-	"github.com/hashicorp/go-uuid"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -33,13 +33,13 @@ type ResetToken struct {
 }
 
 func (u *User) FromUserRequest(request *requests.CreateUserRequest) error {
-	id, _ := uuid.GenerateUUID()
+	id, _ := uuid.NewV7()
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
-	u.ID = id
+	u.ID = id.String()
 	u.FirstName = request.FirstName
 	u.LastName = request.LastName
 	u.Email = request.EmailAddress
