@@ -1,8 +1,6 @@
 package http
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 
 	"example.com/expenses-tracker/internal/handlers"
@@ -44,14 +42,7 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 		return
 	}
 
-	jsonResponse, err := json.Marshal(response)
-	if err != nil {
-		log.Println(err)
-		c.JSON(http.StatusInternalServerError, responses.NewErrorJsonHttpResponse(http.StatusInternalServerError, nil))
-		return
-	}
-
-	c.JSON(http.StatusOK, jsonResponse)
+	c.JSON(http.StatusOK, response)
 }
 
 func (h *AuthHandler) initiateForgottenPassword(c *gin.Context) {
