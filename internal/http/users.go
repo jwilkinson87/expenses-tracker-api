@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"example.com/expenses-tracker/internal/models"
 	"example.com/expenses-tracker/internal/repositories"
 	"example.com/expenses-tracker/internal/requests"
 	"example.com/expenses-tracker/internal/responses"
@@ -31,6 +32,21 @@ func (u *UsersHandler) createUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, responses.NewErrorJsonHttpResponse(http.StatusBadRequest, request, err))
 		return
 	}
+
+	user := &models.User{}
+	if err := user.FromUserRequest(&request); err != nil {
+		log.Fatalln(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+	}
+
+	if err := u.repo.CreateUser(c, user); err != nil {
+		log.Fatalln(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		return
+	}
+
+	c.Header("Location", "/users/"+user.ID)
+	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
 }
 
 func (u *UsersHandler) getAuthenticatedUser(c *gin.Context) {

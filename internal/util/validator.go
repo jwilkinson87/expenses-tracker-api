@@ -1,10 +1,10 @@
 package util
 
 import (
+	"fmt"
 	"reflect"
 
 	"example.com/expenses-tracker/internal/validators"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -12,6 +12,7 @@ const (
 	requiredFieldMessage           = "This field is required"
 	validEmailMessage              = "This field requires a valid email address"
 	defaultFailedValidationMessage = "This field failed validation"
+	eqPasswordMessage              = "Passwords do not match"
 )
 
 func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) map[string]string {
@@ -26,8 +27,6 @@ func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) m
 			fieldName = string(field.Tag.Get("json"))
 		}
 
-		spew.Dump(fieldErrors)
-
 		switch tag {
 		case "required":
 			formatted[fieldName] = requiredFieldMessage
@@ -35,6 +34,10 @@ func FormatValidationMessages(obj any, fieldErrors validator.ValidationErrors) m
 			formatted[fieldName] = validEmailMessage
 		case "validpassword":
 			formatted[fieldName] = validators.ValidPasswordFieldMessage
+		case "eqfield":
+			// Get the name of the field to compare against
+			paramField := fieldError.Param()
+			formatted[fieldName] = fmt.Sprintf("This field must match %s", paramField)
 		default:
 			formatted[fieldName] = defaultFailedValidationMessage
 		}

@@ -25,6 +25,25 @@ func NewUserRepository(db *sql.DB) *userRepository {
 }
 
 func (u *userRepository) CreateUser(ctx context.Context, user *models.User) error {
+	sql := `
+		INSERT INTO users (id, first_name, last_name, email, password, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6)
+	`
+
+	result, err := u.db.ExecContext(ctx, sql, user.ID, user.FirstName, user.LastName, user.Email, user.Password, user.CreatedAt)
+	if err != nil {
+		return fmt.Errorf(errFailedToCreateUser, err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf(errFailedToCreateUser, err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf(errFailedToCreateUser, errors.New("no rows affected"))
+	}
+
 	return nil
 }
 
