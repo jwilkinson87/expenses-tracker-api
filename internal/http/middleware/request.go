@@ -16,7 +16,9 @@ func RequestIdMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("request_id", uuid.String())
+		requestId := uuid.String()
+		c.Set("request_id", requestId)
+		c.Writer.Header().Set("X-Request-Id", requestId)
 
 		c.Next()
 	}

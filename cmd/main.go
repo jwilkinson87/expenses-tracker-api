@@ -71,6 +71,7 @@ func setupContainer(db *sql.DB) {
 
 func setupMiddleware(g *gin.Engine) {
 	g.Use(middleware.RequestIdMiddleware())
+	g.Use(middleware.LoggerMiddleware())
 
 	authMiddleware := middleware.NewAuthMiddleware(container.AuthHandler)
 	container.middleware["auth"] = authMiddleware.HandleAuthToken()
