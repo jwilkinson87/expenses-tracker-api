@@ -31,7 +31,6 @@ services:
       POSTGRES_DB: expenses_db
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./init/db.sql:/docker-entrypoint-initdb.d/init.sql
 
 
   pgadmin:
