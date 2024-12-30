@@ -7,6 +7,7 @@ on:
 
 jobs:
   build_and_push:
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +27,7 @@ jobs:
       - name: Build and push Docker image with commit hash and latest tags
         run: |
           COMMIT_HASH=${{ github.sha }}
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/expenses-tracker-api
+          IMAGE_NAME=ghcr.io/${{ github.repository }}
           
           # Build the image
           docker build -t $IMAGE_NAME:${COMMIT_HASH} -t $IMAGE_NAME:latest .
