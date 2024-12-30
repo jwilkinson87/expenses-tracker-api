@@ -1,5 +1,5 @@
 services:
-  app:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,6 +9,16 @@ services:
       - .env
     depends_on:
       - db
+
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - db
+    command: '/migration /app/sql'
 
   db:
     image: postgres:16
