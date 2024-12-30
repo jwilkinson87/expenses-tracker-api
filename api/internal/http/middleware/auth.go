@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"example.com/expenses-tracker/internal/handlers"
+	"example.com/expenses-tracker/api/internal/handlers"
 	"github.com/gin-gonic/gin"
 )
 

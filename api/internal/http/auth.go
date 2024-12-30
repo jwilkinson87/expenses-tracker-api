@@ -3,8 +3,8 @@ package http
 import (
 	"net/http"
 
-	"example.com/expenses-tracker/internal/handlers"
-	"example.com/expenses-tracker/internal/validation"
+	"example.com/expenses-tracker/api/internal/handlers"
+	"example.com/expenses-tracker/api/internal/validation"
 	"example.com/expenses-tracker/pkg/requests"
 	"example.com/expenses-tracker/pkg/responses"
 	"github.com/gin-gonic/gin"

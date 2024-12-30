@@ -5,8 +5,8 @@ import (
 	"log/slog"
 	"net/http"
 
-	"example.com/expenses-tracker/internal/repositories"
-	"example.com/expenses-tracker/internal/validation"
+	"example.com/expenses-tracker/api/internal/repositories"
+	"example.com/expenses-tracker/api/internal/validation"
 	"example.com/expenses-tracker/pkg/models"
 	"example.com/expenses-tracker/pkg/requests"
 	"example.com/expenses-tracker/pkg/responses"

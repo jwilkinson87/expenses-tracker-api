@@ -1,7 +1,7 @@
 package validation
 
 import (
-	"example.com/expenses-tracker/internal/repositories"
+	"example.com/expenses-tracker/api/internal/repositories"
 	"github.com/go-playground/validator/v10"
 )
 

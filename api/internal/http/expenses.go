@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"net/http"
 
-	"example.com/expenses-tracker/internal/repositories"
+	"example.com/expenses-tracker/api/internal/repositories"
 	"example.com/expenses-tracker/pkg/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

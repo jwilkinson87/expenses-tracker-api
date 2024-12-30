@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"example.com/expenses-tracker/cmd"
+	"example.com/expenses-tracker/api/cmd"
 )
 
 func main() {
