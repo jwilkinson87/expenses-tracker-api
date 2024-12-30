@@ -13,6 +13,7 @@ import (
 	"example.com/expenses-tracker/api/internal/repositories"
 	"example.com/expenses-tracker/api/internal/validation"
 	"example.com/expenses-tracker/pkg/database"
+	"example.com/expenses-tracker/pkg/encryption"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -23,6 +24,7 @@ type Container struct {
 	UserAuthRepository repositories.UserAuthRepository
 	ExpenseRepository  repositories.ExpenseRepository
 	AuthHandler        *handlers.AuthHandler
+	EncryptionHandler  *encryption.EncryptionHandler
 	middleware         map[string]gin.HandlerFunc
 }
 
@@ -65,7 +67,8 @@ func setupContainer(db *sql.DB) {
 	container.UserAuthRepository = repositories.NewAuthRepository(db)
 	container.UserRepository = repositories.NewUserRepository(db)
 	container.ExpenseRepository = repositories.NewExpensesRepository(db)
-	container.AuthHandler = handlers.NewAuthHandler(container.UserAuthRepository, container.UserRepository)
+	container.EncryptionHandler = encryption.NewEncryptionHandlerFromEnvVars()
+	container.AuthHandler = handlers.NewAuthHandler(container.UserAuthRepository, container.UserRepository, container.EncryptionHandler)
 	container.middleware = make(map[string]gin.HandlerFunc, 1)
 }
 
