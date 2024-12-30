@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS reset_tokens (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expiry_time TIMESTAMP,
     reset_token VARCHAR(64) NOT NULL,
-    user_id UUID REFERNECES users (id) ON DELETE CASCADE
+    user_id UUID REFERENCES users (id) ON DELETE CASCADE
 );
