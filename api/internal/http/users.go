@@ -1,7 +1,6 @@
 package http
 
 import (
-	"encoding/json"
 	"log/slog"
 	"net/http"
 
@@ -54,14 +53,6 @@ func (u *UsersHandler) createUser(c *gin.Context) {
 }
 
 func (u *UsersHandler) getAuthenticatedUser(c *gin.Context) {
-	user := c.MustGet("user").(string)
-
-	jsonResponse, err := json.Marshal(user)
-	if err != nil {
-		slog.Debug("failed to retrieve authenticated user", "error", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve authenticated user"})
-		return
-	}
-
-	c.JSON(http.StatusOK, jsonResponse)
+	user := c.MustGet("user").(*models.User)
+	c.JSON(http.StatusOK, user)
 }

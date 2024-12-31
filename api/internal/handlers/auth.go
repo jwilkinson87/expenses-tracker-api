@@ -111,12 +111,12 @@ func (h *AuthHandler) GetBySessionID(ctx context.Context, sessionId string) (*mo
 }
 
 func (h *AuthHandler) ValidateDigitalFootprint(ctx context.Context, session *models.UserSession, digitalFootprint string) (bool, error) {
-	token, err := h.userSessionRepository.GetBySessionID(ctx, session.SessionID)
+	unhashedDigitalFootprint, err := base64.RawStdEncoding.DecodeString(session.DigitalFingerPrint)
 	if err != nil {
 		return false, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(token.DigitalFingerPrint), []byte(digitalFootprint))
+	err = bcrypt.CompareHashAndPassword(unhashedDigitalFootprint, []byte(digitalFootprint))
 	return err == nil, err
 }
 
