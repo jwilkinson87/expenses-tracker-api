@@ -82,13 +82,15 @@ func setupMiddleware(g *gin.Engine) {
 }
 
 func setupHttpHandlers(g *gin.Engine) {
+	authMiddleware := container.middleware["auth"]
 	expensesGroup := g.Group("/api/expenses")
-	expensesGroup.Use(container.middleware["auth"])
+	expensesGroup.Use(authMiddleware)
 	expenseHandler := http.NewExpensesHandler(container.ExpenseRepository)
 	expenseHandler.RegisterRoutes(expensesGroup)
 
-	userHandler := http.NewUsersHandler(container.UserRepository)
-	userHandler.RegisterRoutes(g)
+	userHandler := http.NewUsersHandler(container.UserRepository, &authMiddleware)
+	usersGroup := g.Group("/api/users")
+	userHandler.RegisterRoutes(usersGroup)
 
 	authHandler := http.NewAuthHandler(*container.AuthHandler)
 	authHandler.RegisterRoutes(g)

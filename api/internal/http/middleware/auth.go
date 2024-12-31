@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log/slog"
 	"net/http"
 
 	"example.com/expenses-tracker/api/internal/handlers"
@@ -17,6 +18,7 @@ func NewAuthMiddleware(handler *handlers.AuthHandler) *authMiddleware {
 
 func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		slog.Debug("auth middleware applied", "debug", true)
 		token := c.Request.Header.Get("authorization")
 		if token == "" || len(token) == 0 {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})

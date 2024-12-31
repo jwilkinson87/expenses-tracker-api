@@ -15,16 +15,17 @@ import (
 )
 
 type UsersHandler struct {
-	repo repositories.UserRepository
+	repo       repositories.UserRepository
+	middleware *gin.HandlerFunc
 }
 
-func NewUsersHandler(repo repositories.UserRepository) *UsersHandler {
-	return &UsersHandler{repo: repo}
+func NewUsersHandler(repo repositories.UserRepository, middleware *gin.HandlerFunc) *UsersHandler {
+	return &UsersHandler{repo: repo, middleware: middleware}
 }
 
-func (u *UsersHandler) RegisterRoutes(g *gin.Engine) {
-	g.POST("/users", u.createUser)
-	g.GET("/whoami", u.getAuthenticatedUser)
+func (u *UsersHandler) RegisterRoutes(g *gin.RouterGroup) {
+	g.POST("", u.createUser)
+	g.GET("/whoami", *u.middleware, u.getAuthenticatedUser)
 }
 
 func (u *UsersHandler) createUser(c *gin.Context) {
@@ -53,7 +54,7 @@ func (u *UsersHandler) createUser(c *gin.Context) {
 }
 
 func (u *UsersHandler) getAuthenticatedUser(c *gin.Context) {
-	token := c.MustGet("user_token").(string) // At this point, it's already been validated
+	token := c.MustGet("user_token").(string)
 	user, err := u.repo.GetUserByAuthToken(c, token)
 	if err != nil {
 		slog.Debug("failed to retrieve authenticated user", "error", err.Error())
