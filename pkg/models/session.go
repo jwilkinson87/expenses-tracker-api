@@ -6,7 +6,6 @@ type UserSession struct {
 	ID                 string
 	User               *User
 	DigitalFingerPrint string
-	SessionID          string
 	CreatedAt          time.Time
 	ExpiryTime         time.Time
 }

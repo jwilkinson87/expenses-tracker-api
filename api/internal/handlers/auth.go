@@ -67,7 +67,6 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, digitalFingerprint
 	session := &models.UserSession{
 		ID:                 base64.RawStdEncoding.EncodeToString(sessionID),
 		DigitalFingerPrint: base64.RawStdEncoding.EncodeToString(fingerprintAsBytes),
-		SessionID:          user.ID,
 		CreatedAt:          time.Now(),
 		ExpiryTime:         expiryTime,
 		User:               user,

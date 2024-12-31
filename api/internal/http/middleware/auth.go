@@ -60,7 +60,7 @@ func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 			return
 		}
 
-		user, err := a.handler.GetUserBySessionID(c, session.SessionID)
+		user, err := a.handler.GetUserBySessionID(c, session.ID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to verify token"})
 			c.Abort()
