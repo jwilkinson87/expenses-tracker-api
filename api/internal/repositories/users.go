@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"example.com/expenses-tracker/pkg/models"
+	"github.com/davecgh/go-spew/spew"
 )
 
 const (
@@ -77,18 +78,20 @@ func (u *userRepository) GetUserByEmailAddress(ctx context.Context, email string
 	return &user, nil
 }
 
-func (u *userRepository) GetUserByAuthToken(ctx context.Context, token string) (*models.User, error) {
+func (u *userRepository) GetUserBySessionID(ctx context.Context, token string) (*models.User, error) {
 	sql := `
 		SELECT
 			u.id, u.first_name, u.last_name, u.email, u.password, u.created_at
 		FROM
 			users u
 		JOIN
-			users_auth_tokens at ON at.user_id = u.id
+			users_sessions s ON s.user_id = u.id
 		WHERE 
-			at.token_value = $1 AND expiry_time <= CURRENT_TIMESTAMP()
+			s.id = $1
 		LIMIT 1
 	`
+
+	spew.Dump(token)
 
 	var user models.User
 	err := u.db.QueryRowContext(ctx, sql, token).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt)

@@ -54,13 +54,7 @@ func (u *UsersHandler) createUser(c *gin.Context) {
 }
 
 func (u *UsersHandler) getAuthenticatedUser(c *gin.Context) {
-	token := c.MustGet("user_token").(string)
-	user, err := u.repo.GetUserByAuthToken(c, token)
-	if err != nil {
-		slog.Debug("failed to retrieve authenticated user", "error", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve authenticated user"})
-		return
-	}
+	user := c.MustGet("user").(string)
 
 	jsonResponse, err := json.Marshal(user)
 	if err != nil {

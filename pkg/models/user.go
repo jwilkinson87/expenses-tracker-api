@@ -17,15 +17,6 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type UserSession struct {
-	ID                 string
-	User               *User
-	DigitalFingerPrint string
-	SessionID          string
-	CreatedAt          time.Time
-	ExpiryTime         time.Time
-}
-
 type ResetToken struct {
 	ID         string
 	CreatedAt  time.Time

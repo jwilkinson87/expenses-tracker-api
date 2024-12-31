@@ -36,47 +36,20 @@ func (r *userSessionRepository) DeleteAllForUser(ctx context.Context, user *mode
 
 func (r *userSessionRepository) GetBySessionID(ctx context.Context, sessionID string) (*models.UserSession, error) {
 	var session models.UserSession
-	var user models.User
 
 	err := r.db.QueryRowContext(
 		ctx,
-		`SELECT 
-        s.id,
-        s.digital_fingerprint, 
-        s.created_at, 
-        s.expires_at, 
-        u.id AS user_id, 
-        u.first_name, 
-        u.last_name, 
-        u.email, 
-        u.password, 
-        u.created_at
-     FROM 
-        users_sessions s
-     JOIN 
-        users u
-     ON 
-        s.user_id = u.id
-     WHERE 
-        s.id = $1`,
+		`SELECT s.id, s.digital_fingerprint, s.created_at, s.expires_at FROM users_sessions s WHERE s.id = $1`,
 		sessionID,
 	).Scan(
 		&session.ID,
 		&session.DigitalFingerPrint,
 		&session.CreatedAt,
 		&session.ExpiryTime,
-		&user.ID,
-		&user.FirstName,
-		&user.LastName,
-		&user.Email,
-		&user.Password,
-		&user.CreatedAt,
 	)
 	if err != nil {
 		return nil, err
 	}
-
-	session.User = &user
 
 	return &session, nil
 }

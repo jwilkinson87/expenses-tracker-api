@@ -1,10 +1,12 @@
 package middleware
 
 import (
-	"log/slog"
+	"errors"
 	"net/http"
+	"strings"
 
 	"example.com/expenses-tracker/api/internal/handlers"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,28 +20,54 @@ func NewAuthMiddleware(handler *handlers.AuthHandler) *authMiddleware {
 
 func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		slog.Debug("auth middleware applied", "debug", true)
-		token := c.Request.Header.Get("authorization")
+		authHeader := c.Request.Header.Get("authorization")
+		token, found := strings.CutPrefix(authHeader, "Bearer ")
+		if !found {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid session"})
+			c.Abort()
+			return
+		}
+
 		if token == "" || len(token) == 0 {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			return
 		}
 
-		isValid, err := a.handler.ValidateToken(c, token)
+		sessionId, err := a.handler.GetSessionIdFromToken(c, token)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to validate token"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": getErrorMessage(err)})
 			c.Abort()
 			return
 		}
 
-		if !isValid {
+		if sessionId == nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			return
 		}
 
-		c.Set("user_token", token)
+		user, err := a.handler.GetUserBySessionID(c, *sessionId)
+		if err != nil {
+			spew.Dump(err, *sessionId)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to verify token"})
+			c.Abort()
+			return
+		}
+
+		c.Set("user", user)
 		c.Next()
 	}
+}
+
+func getErrorMessage(err error) string {
+	if errors.Is(err, handlers.ErrExpiredToken) {
+		return "Expired session"
+	}
+
+	if errors.Is(err, handlers.ErrInvalidToken) {
+		return "Invalid session"
+	}
+
+	return "Unable to validate token"
 }
