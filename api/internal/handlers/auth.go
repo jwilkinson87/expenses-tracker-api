@@ -74,6 +74,7 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, digitalFingerprint
 	}
 
 	token := h.tokenHandler.GenerateForSession(session, expiryTime)
+	h.userSessionRepository.DeleteAllForUser(ctx, user)
 	err = h.userSessionRepository.CreateSession(ctx, session)
 	if err != nil {
 		return nil, fmt.Errorf(errFailedToCreateSession, err)
@@ -103,6 +104,24 @@ func (h *AuthHandler) GetSessionIdFromToken(ctx context.Context, token string) (
 	}
 
 	return sessionId, nil
+}
+
+func (h *AuthHandler) GetBySessionID(ctx context.Context, sessionId string) (*models.UserSession, error) {
+	return h.userSessionRepository.GetBySessionID(ctx, sessionId)
+}
+
+func (h *AuthHandler) ValidateDigitalFootprint(ctx context.Context, session *models.UserSession, digitalFootprint string) (bool, error) {
+	token, err := h.userSessionRepository.GetBySessionID(ctx, session.SessionID)
+	if err != nil {
+		return false, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(token.DigitalFingerPrint), []byte(digitalFootprint))
+	return err == nil, err
+}
+
+func (h *AuthHandler) DeleteSession(ctx context.Context, session *models.UserSession) error {
+	return h.userSessionRepository.DeleteSession(ctx, session)
 }
 
 func (h *AuthHandler) GetUserBySessionID(ctx context.Context, token string) (*models.User, error) {

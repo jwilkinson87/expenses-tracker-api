@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"example.com/expenses-tracker/api/internal/handlers"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
 )
 
@@ -47,9 +46,29 @@ func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 			return
 		}
 
+		session, err := a.handler.GetBySessionID(c, *sessionId)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to verify token"})
+			c.Abort()
+			return
+		}
+
+		isValid, err := a.handler.ValidateDigitalFootprint(c, session, c.MustGet("digital_fingerprint").(string))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to verify token"})
+			c.Abort()
+			return
+		}
+
+		if !isValid {
+			a.handler.DeleteSession(c, session)
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+
 		user, err := a.handler.GetUserBySessionID(c, *sessionId)
 		if err != nil {
-			spew.Dump(err, *sessionId)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to verify token"})
 			c.Abort()
 			return
