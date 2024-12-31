@@ -36,7 +36,8 @@ func (h *AuthHandler) loginUser(c *gin.Context) {
 		return
 	}
 
-	response, err := h.internalHandler.HandleLoginRequest(c, &loginRequest)
+	digitalFingerprint := c.MustGet("digital_fingerprint").(string)
+	response, err := h.internalHandler.HandleLoginRequest(c, digitalFingerprint, &loginRequest)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, responses.NewErrorJsonHttpResponse(http.StatusUnauthorized, nil))
 		return

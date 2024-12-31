@@ -22,11 +22,11 @@ type UserRepository interface {
 	GetUserByAuthToken(context.Context, string) (*models.User, error)
 }
 
-type UserAuthRepository interface {
-	CreateAuthToken(context.Context, *models.UserToken) error
-	DeleteAuthToken(context.Context, *models.UserToken) error
+type UserSessionRepository interface {
+	CreateSession(context.Context, *models.UserSession) error
+	DeleteSession(context.Context, *models.UserSession) error
 	DeleteAllForUser(context.Context, *models.User) error
-	GetByAuthToken(context.Context, string) (*models.UserToken, error)
+	GetBySessionID(context.Context, string) (*models.UserSession, error)
 }
 
 type ResetTokenRepository interface {

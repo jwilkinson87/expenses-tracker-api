@@ -17,12 +17,13 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type UserToken struct {
-	ID         string
-	Value      string
-	User       *User
-	CreatedAt  *time.Time
-	ExpiryTime *time.Time
+type UserSession struct {
+	ID                 string
+	User               *User
+	DigitalFingerPrint string
+	SessionID          string
+	CreatedAt          time.Time
+	ExpiryTime         time.Time
 }
 
 type ResetToken struct {
@@ -48,8 +49,4 @@ func (u *User) FromUserRequest(request *requests.CreateUserRequest) error {
 	u.CreatedAt = time.Now()
 
 	return nil
-}
-
-func (u *UserToken) IsTokenValid() bool {
-	return u.ExpiryTime.Before(time.Now())
 }

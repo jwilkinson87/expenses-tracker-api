@@ -7,25 +7,25 @@ import (
 	"os"
 	"sync"
 
+	"example.com/expenses-tracker/api/internal/auth"
 	"example.com/expenses-tracker/api/internal/handlers"
 	"example.com/expenses-tracker/api/internal/http"
 	"example.com/expenses-tracker/api/internal/http/middleware"
 	"example.com/expenses-tracker/api/internal/repositories"
 	"example.com/expenses-tracker/api/internal/validation"
 	"example.com/expenses-tracker/pkg/database"
-	"example.com/expenses-tracker/pkg/encryption"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 )
 
 type Container struct {
-	UserRepository     repositories.UserRepository
-	UserAuthRepository repositories.UserAuthRepository
-	ExpenseRepository  repositories.ExpenseRepository
-	AuthHandler        *handlers.AuthHandler
-	EncryptionHandler  *encryption.EncryptionHandler
-	middleware         map[string]gin.HandlerFunc
+	UserRepository        repositories.UserRepository
+	UserSessionRepository repositories.UserSessionRepository
+	ExpenseRepository     repositories.ExpenseRepository
+	AuthHandler           *handlers.AuthHandler
+	TokenHandler          *auth.TokenHandler
+	middleware            map[string]gin.HandlerFunc
 }
 
 var (
@@ -64,17 +64,18 @@ func Setup() {
 }
 
 func setupContainer(db *sql.DB) {
-	container.UserAuthRepository = repositories.NewAuthRepository(db)
+	container.UserSessionRepository = repositories.NewUserSessionRepository(db)
 	container.UserRepository = repositories.NewUserRepository(db)
 	container.ExpenseRepository = repositories.NewExpensesRepository(db)
-	container.EncryptionHandler = encryption.NewEncryptionHandlerFromEnvVars()
-	container.AuthHandler = handlers.NewAuthHandler(container.UserAuthRepository, container.UserRepository, container.EncryptionHandler)
+	container.TokenHandler = auth.NewTokenHandler([]byte(os.Getenv("ENCRYPTION_KEY")))
+	container.AuthHandler = handlers.NewAuthHandler(container.UserSessionRepository, container.UserRepository, container.TokenHandler)
 	container.middleware = make(map[string]gin.HandlerFunc, 1)
 }
 
 func setupMiddleware(g *gin.Engine) {
 	g.Use(middleware.RequestIdMiddleware())
 	g.Use(middleware.LoggerMiddleware())
+	g.Use(middleware.GenerateDigitalFingerprint())
 
 	authMiddleware := middleware.NewAuthMiddleware(container.AuthHandler)
 	container.middleware["auth"] = authMiddleware.HandleAuthToken()

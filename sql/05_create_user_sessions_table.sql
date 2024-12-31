@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS users_session(
+    id VARCHAR(255) PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    digital_fingerprint VARCHAR(1024) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    expires_at TIMESTAMP NOT NULL
+);
