@@ -3,8 +3,13 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"errors"
 
 	"example.com/expenses-tracker/pkg/models"
+)
+
+var (
+	ErrSessionNotFound = errors.New("session not found")
 )
 
 type userSessionRepository struct {
@@ -48,6 +53,10 @@ func (r *userSessionRepository) GetBySessionID(ctx context.Context, sessionID st
 		&session.ExpiryTime,
 	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrSessionNotFound
+		}
+
 		return nil, err
 	}
 

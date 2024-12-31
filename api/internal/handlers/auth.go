@@ -88,7 +88,7 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, digitalFingerprint
 	return response, nil
 }
 
-func (h *AuthHandler) GetSessionIdFromToken(ctx context.Context, token string) (*string, error) {
+func (h *AuthHandler) GetSessionFromToken(ctx context.Context, token string) (*models.UserSession, error) {
 	isValid, sessionId := h.tokenHandler.ValidateToken(token)
 	if !isValid {
 		return nil, ErrInvalidToken
@@ -96,6 +96,10 @@ func (h *AuthHandler) GetSessionIdFromToken(ctx context.Context, token string) (
 
 	session, err := h.userSessionRepository.GetBySessionID(ctx, *sessionId)
 	if err != nil {
+		if errors.Is(err, repositories.ErrSessionNotFound) {
+			return nil, ErrInvalidToken
+		}
+
 		return nil, err
 	}
 
@@ -103,11 +107,16 @@ func (h *AuthHandler) GetSessionIdFromToken(ctx context.Context, token string) (
 		return nil, ErrExpiredToken
 	}
 
-	return sessionId, nil
+	return session, nil
 }
 
 func (h *AuthHandler) GetBySessionID(ctx context.Context, sessionId string) (*models.UserSession, error) {
-	return h.userSessionRepository.GetBySessionID(ctx, sessionId)
+	session, err := h.userSessionRepository.GetBySessionID(ctx, sessionId)
+	if errors.Is(err, repositories.ErrSessionNotFound) {
+		return nil, ErrInvalidToken
+	}
+
+	return session, nil
 }
 
 func (h *AuthHandler) ValidateDigitalFootprint(ctx context.Context, session *models.UserSession, digitalFootprint string) (bool, error) {

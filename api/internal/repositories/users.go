@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"example.com/expenses-tracker/pkg/models"
-	"github.com/davecgh/go-spew/spew"
 )
 
 const (
@@ -90,8 +89,6 @@ func (u *userRepository) GetUserBySessionID(ctx context.Context, token string) (
 			s.id = $1
 		LIMIT 1
 	`
-
-	spew.Dump(token)
 
 	var user models.User
 	err := u.db.QueryRowContext(ctx, sql, token).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Password, &user.CreatedAt)
