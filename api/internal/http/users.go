@@ -14,17 +14,16 @@ import (
 )
 
 type UsersHandler struct {
-	repo       repositories.UserRepository
-	middleware *gin.HandlerFunc
+	repo repositories.UserRepository
 }
 
-func NewUsersHandler(repo repositories.UserRepository, middleware *gin.HandlerFunc) *UsersHandler {
-	return &UsersHandler{repo: repo, middleware: middleware}
+func NewUsersHandler(repo repositories.UserRepository) *UsersHandler {
+	return &UsersHandler{repo: repo}
 }
 
-func (u *UsersHandler) RegisterRoutes(g *gin.RouterGroup) {
+func (u *UsersHandler) RegisterRoutes(g *gin.RouterGroup, middlewares ...gin.HandlerFunc) {
 	g.POST("", u.createUser)
-	g.GET("/whoami", *u.middleware, u.getAuthenticatedUser)
+	g.GET("/whoami", append(middlewares, u.getAuthenticatedUser)...)
 }
 
 func (u *UsersHandler) createUser(c *gin.Context) {

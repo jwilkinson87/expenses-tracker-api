@@ -128,8 +128,7 @@ func (h *AuthHandler) GetUserBySessionID(ctx context.Context, token string) (*mo
 	return h.userRepository.GetUserBySessionID(ctx, token)
 }
 
-func (h *AuthHandler) HandleLogout(ctx context.Context, token string) (bool, error) {
-	// TODO - blacklist a token
-
-	return true, nil
+func (h *AuthHandler) HandleLogout(ctx context.Context, user *models.User) (bool, error) {
+	err := h.userSessionRepository.DeleteAllForUser(ctx, user)
+	return err == nil, err
 }

@@ -6,6 +6,7 @@ import (
 
 	"example.com/expenses-tracker/api/internal/handlers"
 	"example.com/expenses-tracker/api/internal/validation"
+	"example.com/expenses-tracker/pkg/models"
 	"example.com/expenses-tracker/pkg/requests"
 	"example.com/expenses-tracker/pkg/responses"
 	"github.com/gin-gonic/gin"
@@ -21,11 +22,11 @@ func NewAuthHandler(internalHandler handlers.AuthHandler) *AuthHandler {
 	return &AuthHandler{internalHandler: internalHandler}
 }
 
-func (h *AuthHandler) RegisterRoutes(g *gin.Engine) {
+func (h *AuthHandler) RegisterRoutes(g *gin.Engine, middlewares ...gin.HandlerFunc) {
 	g.POST("/login", h.loginUser)
 	g.POST("/forgot-password", h.initiateForgottenPassword)
 	g.POST("/reset-password", h.updatePasswordFromResetRequest)
-	g.POST("/logout", h.logoutUser)
+	g.POST("/logout", append(middlewares, h.logoutUser)...)
 }
 
 func (h *AuthHandler) loginUser(c *gin.Context) {
@@ -61,13 +62,13 @@ func (h *AuthHandler) updatePasswordFromResetRequest(c *gin.Context) {
 }
 
 func (h *AuthHandler) logoutUser(c *gin.Context) {
-	token, exists := c.Get("user_token")
+	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "you are not logged in"})
 		return
 	}
 
-	success, err := h.internalHandler.HandleLogout(c, token.(string))
+	success, err := h.internalHandler.HandleLogout(c, user.(*models.User))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "logout could not be completed"})
 		return

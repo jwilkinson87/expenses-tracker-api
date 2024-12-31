@@ -88,12 +88,12 @@ func setupHttpHandlers(g *gin.Engine) {
 	expenseHandler := http.NewExpensesHandler(container.ExpenseRepository)
 	expenseHandler.RegisterRoutes(expensesGroup)
 
-	userHandler := http.NewUsersHandler(container.UserRepository, &authMiddleware)
+	userHandler := http.NewUsersHandler(container.UserRepository)
 	usersGroup := g.Group("/api/users")
-	userHandler.RegisterRoutes(usersGroup)
+	userHandler.RegisterRoutes(usersGroup, authMiddleware)
 
 	authHandler := http.NewAuthHandler(*container.AuthHandler)
-	authHandler.RegisterRoutes(g)
+	authHandler.RegisterRoutes(g, authMiddleware)
 }
 
 func setupValidators() {

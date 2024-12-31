@@ -63,7 +63,7 @@ func (a *authMiddleware) HandleAuthToken() gin.HandlerFunc {
 		}
 
 		if !isValid {
-			// a.handler.DeleteSession(c, session)
+			a.handler.DeleteSession(c, session)
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 			c.Abort()
 			return
