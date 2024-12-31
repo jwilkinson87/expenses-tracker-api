@@ -6,7 +6,7 @@ type LoginRequest struct {
 }
 
 type CreateUserRequest struct {
-	EmailAddress    string `json:"email_address" binding:"required,email" validation[required]:"Please provide an email address" validation[email]:"Please provide a valid email address"`
+	EmailAddress    string `json:"email_address" binding:"required,email,uniqueemail" validation[required]:"Please provide an email address" validation[email]:"Please provide a valid email address" validation[uniqueemail]:"This email address already has an account registered with it. Please try logging in with that, or initiate a reset password request"`
 	FirstName       string `json:"first_name" binding:"required,alpha" validation[required]:"Please provide a first name" validation[alpha]:"First name must contain only letters"`
 	LastName        string `json:"last_name" binding:"required,alpha" validation[required]:"Please provide a last name" validation[alpha]:"Last name must contain only letters"`
 	Password        string `json:"password" binding:"required,validpassword" validation[required]:"Please provide a password" validation[validpassword]:"This field requires a valid password. Please enter a password that has at least 1 upper character, 1 lower character, 1 number, 1 special character, and is at least 7 characters in length"`

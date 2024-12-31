@@ -99,5 +99,6 @@ func setupHttpHandlers(g *gin.Engine) {
 func setupValidators() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("validpassword", validation.ValidPassword)
+		v.RegisterValidation("uniqueemail", validation.UniqueEmail(container.UserRepository))
 	}
 }
