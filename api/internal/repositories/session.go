@@ -16,7 +16,7 @@ func NewUserSessionRepository(db *sql.DB) *userSessionRepository {
 }
 
 func (r *userSessionRepository) CreateSession(ctx context.Context, session *models.UserSession) error {
-	_, err := r.db.ExecContext(ctx, "INSERT INTO user_sessions (id, user_id, digital_fingerprint, created_at, expiry_time) VALUES ($1, $2, $3, $4)", session.ID, session.User.ID, session.DigitalFingerPrint, session.CreatedAt, session.ExpiryTime)
+	_, err := r.db.ExecContext(ctx, "INSERT INTO users_sessions (id, user_id, digital_fingerprint, created_at, expires_at) VALUES ($1, $2, $3, $4, $5)", session.ID, session.User.ID, session.DigitalFingerPrint, session.CreatedAt, session.ExpiryTime)
 	if err != nil {
 		return err
 	}
@@ -25,12 +25,12 @@ func (r *userSessionRepository) CreateSession(ctx context.Context, session *mode
 }
 
 func (r *userSessionRepository) DeleteSession(ctx context.Context, session *models.UserSession) error {
-	_, err := r.db.ExecContext(ctx, "DELETE FROM user_sessions WHERE id = $1", session.ID)
+	_, err := r.db.ExecContext(ctx, "DELETE FROM users_sessions WHERE id = $1", session.ID)
 	return err
 }
 
 func (r *userSessionRepository) DeleteAllForUser(ctx context.Context, user *models.User) error {
-	_, err := r.db.ExecContext(ctx, "DELETE FROM user_sessions WHERE user_id = $1", user.ID)
+	_, err := r.db.ExecContext(ctx, "DELETE FROM users_sessions WHERE user_id = $1", user.ID)
 	return err
 }
 
@@ -44,7 +44,7 @@ func (r *userSessionRepository) GetBySessionID(ctx context.Context, sessionID st
         s.id,
         s.digital_fingerprint, 
         s.created_at, 
-        s.expiry_time, 
+        s.expires_at, 
         u.id AS user_id, 
         u.first_name, 
         u.last_name, 
@@ -52,7 +52,7 @@ func (r *userSessionRepository) GetBySessionID(ctx context.Context, sessionID st
         u.password, 
         u.created_at
      FROM 
-        user_sessions s
+        users_sessions s
      JOIN 
         users u
      ON 

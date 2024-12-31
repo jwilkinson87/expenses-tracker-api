@@ -13,10 +13,6 @@ type ErrorResponse struct {
 }
 
 func NewErrorResponse(message string, details map[string]string) *ErrorResponse {
-	if details == nil {
-		details = map[string]string{}
-	}
-
 	return &ErrorResponse{
 		Status: "error",
 		ErrorDetails: ErrorDetails{

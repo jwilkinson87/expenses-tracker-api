@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"example.com/expenses-tracker/api/internal/auth"
@@ -16,14 +17,14 @@ import (
 )
 
 const (
-	errInvalidToken            = "invalid token"
+	ErrInvalidToken            = "invalid token"
 	errFailedToCreateSession   = "failed to create session: %w"
 	errFailedToCheckToken      = "failed to check token: %w"
 	errFailedToCreateToken     = "failed to create token: %w"
 	errFailedToGetTokenByValue = "failed to get token by value: %w"
 	errFailedToGetUserByEmail  = "failed to get user by email address: %w"
 	errFailedToGetUserByToken  = "failed to get user by token: %w"
-	errInvalidCredentials      = "user credentials incorrect"
+	ErrInvalidCredentials      = "user credentials incorrect"
 )
 
 type AuthHandler struct {
@@ -57,11 +58,13 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, digitalFingerprint
 	}
 
 	if user == nil {
-		return nil, errors.New(errInvalidCredentials)
+		slog.Debug("user not found", "error", err)
+		return nil, errors.New(ErrInvalidCredentials)
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
-		return nil, errors.New(errInvalidCredentials)
+		slog.Debug("invalid credentials", "error", err.Error())
+		return nil, errors.New(ErrInvalidCredentials)
 	}
 
 	expiryDuration, _ := time.ParseDuration("20m")
@@ -81,6 +84,7 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, digitalFingerprint
 	token := h.tokenHandler.GenerateForSession(session, expiryTime)
 	err = h.userSessionRepository.CreateSession(ctx, session)
 	if err != nil {
+		slog.Debug("failed to create session", "error", err)
 		return nil, fmt.Errorf(errFailedToCreateSession, err)
 	}
 
@@ -95,7 +99,7 @@ func (h *AuthHandler) HandleLoginRequest(ctx context.Context, digitalFingerprint
 func (h *AuthHandler) ValidateToken(ctx context.Context, token string) (bool, error) {
 	isValid, sessionId := h.tokenHandler.ValidateToken(token)
 	if !isValid {
-		return false, errors.New(errInvalidToken)
+		return false, errors.New(ErrInvalidToken)
 	}
 
 	_, err := h.userSessionRepository.GetBySessionID(ctx, *sessionId)
