@@ -7,7 +7,6 @@ import (
 	"example.com/expenses-tracker/api/internal/repositories"
 	"example.com/expenses-tracker/pkg/models"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type ExpenseHandler struct {
@@ -25,12 +24,8 @@ func (e *ExpenseHandler) RegisterRoutes(g *gin.RouterGroup) {
 }
 
 func (e *ExpenseHandler) getAll(c *gin.Context) {
-	uuid, _ := uuid.NewV7()
 	ctx := c.Request.Context()
-	// TODO: This needs to be an authenticated user
-	user := &models.User{
-		ID: uuid.String(),
-	}
+	user := c.MustGet("user").(*models.User)
 
 	expenses, err := e.repo.GetAllForUser(ctx, user)
 	if err != nil {
